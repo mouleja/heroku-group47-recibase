@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>d03a36cc-bdc6-4379-9ca4-1412490d7da3</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>cs340_project.py</StartupFile>
+    <StartupFile>recipe_server\recipe_server.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -22,7 +22,16 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="cs340_project.py" />
+    <Compile Include="hello.py" />
+    <Compile Include="recipe_server\app.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="recipe_server\db_connection.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="recipe_server\recipe_server.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="venv\">
@@ -34,6 +43,14 @@
       <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
       <Architecture>X64</Architecture>
     </Interpreter>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="recipe_server\" />
+    <Folder Include="recipe_server\templates\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="recipe_server\templates\recipeList.html" />
+    <Content Include="recipe_server\templates\recipeDetails.html" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

@@ -1,0 +1,26 @@
+﻿<!DOCTYPE html>
+<!-- Adapted from CS340_starter_flask_app -->
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+    <h3>Current recipes: (Click Name for detailed info)</h3>
+
+    <table border='1'>
+        <thead>
+        <th>Recipe Name</th>
+        <th>User Id</th>
+        <th>Date</th>
+        <th>Source Id</th>
+        </thead>
+        <tbody>
+            {% for r in recipes %}
+            <tr>
+                <td><a href="/show_recipe/{{r.recipeId}}">{{r.name}}</a></td>
+                <td>{{r.userId}}</td>
+                <td>{{r.date}}</td>
+                <td>{{r.sourceId}}</td>
+                <td><button onclick="deletePerson({{r.recipeId}})">Delete</button></td>
+                <td><a href="/people/{{r.recipeId}}">Update</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</html>
