@@ -1,0 +1,2 @@
+#!/bin/bash
+gunicorn run:app -b 0.0.0.0:6778 -D

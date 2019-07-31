@@ -1,0 +1,3 @@
+#!/bin/bash
+ps ax|grep mouleja
+printf "\nNow 'kill' the first number (use -9 in emergency)\n\n"
