@@ -49,8 +49,11 @@
     <Folder Include="recipe_server\templates\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="recipe_server\templates\confirm_delete.html" />
+    <Content Include="recipe_server\templates\index.html" />
     <Content Include="recipe_server\templates\recipeList.html" />
     <Content Include="recipe_server\templates\recipeDetails.html" />
+    <Content Include="recipe_server\templates\update_recipe.html" />
     <Content Include="requirements.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />

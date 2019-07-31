@@ -1,0 +1,12 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+    <h2>Are you sure you want to delete recipe: {{recipe.name}}?</h2>
+
+    <form action="/delete" method="post">
+        <input type="hidden" name="id" value="{{recipeId}}" />
+        <input type="submit" value="DELETE" />
+    </form><br />
+    <h4>Delete not actually functional at this point</h4>
+</html>

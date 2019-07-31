@@ -75,20 +75,74 @@ def show_recipe(id):
     #return redirect('/')
     return 'Something went wrong in show_recipe!'
         
-@app.route('/')
-def index():
+@app.route('/update_recipe/<int:id>')
+def update_recipe(id):
+
     try:
         conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
-        cursor.execute("SELECT * FROM diagnostic;")
-        result = cursor.fetchone() or {'text':'Nothing in diagnostic!!'}
-        return result['text'] #render_template('index.html', result=result['text'])
+        cursor.execute(
+            f'''SELECT r.name rname, r.date, u.name uname, s.name sname FROM Recipe r
+            INNER JOIN User u ON u.userId = r.userId
+            INNER JOIN Source s ON s.sourceId = r.sourceId
+            WHERE r.recipeId = {id}'''
+        )
+        recipeInfo = cursor.fetchone() or {'rname':'Error'}
+
+        cursor.execute(
+            f'''SELECT i.name, ri.amount, ri.unit, ri.preperation
+            FROM Recipe_Ingredient ri
+            INNER JOIN Ingredient i ON i.ingredientId = ri.ingredientId
+            WHERE ri.recipeId = {id}'''
+        )
+        ingredients = cursor.fetchall() or [{'name': 'ERROR'}]
+
+        cursor.execute(
+            f'''SELECT instruction FROM Step WHERE recipeId = {id}'''
+        )
+        steps = cursor.fetchall() or [{'instruction': 'ERROR'}]
+
+        print("Updating recipe details:", recipeInfo, ingredients, steps)
+        return render_template('update_recipe.html', recipeInfo=recipeInfo,
+                               ingredients=ingredients, steps=steps)
     except Exception as e:
-        print("ERROR with SQL CONNECTION",e)
+        print("Error getting recipe",id, e)
     finally:
         cursor.close() 
         conn.close()
-    return 'Something went wrong!'
+
+    return 'Something went wrong in update_recipe!'
+
+@app.route('/delete_recipe/<int:id>')
+def delete_recipe(id):
+
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        cursor.execute(
+            f'''SELECT r.name FROM Recipe r WHERE r.recipeId = {id}'''
+        )
+        recipe = cursor.fetchone() or {'rname':'Error'}
+
+        print("Delete recipe?", recipe)
+        return render_template('confirm_delete.html', recipe=recipe, recipeId=id)
+    except Exception as e:
+        print("Error getting recipe",id, e)
+    finally:
+        cursor.close() 
+        conn.close()
+
+    return 'Something went wrong in delete_recipe!'
+
+@app.route('/delete', methods=['POST'])
+def delete():
+    id = request.form['id']
+    print("Delete processed for recipe id #",id)
+    return redirect("/get_recipes")
+
+@app.route('/')
+def index():
+    return render_template('index.html')
 
 if __name__ == "__main__":
     app.run(port=6778)

@@ -17,8 +17,9 @@
                 <td>{{r.userId}}</td>
                 <td>{{r.date}}</td>
                 <td>{{r.sourceId}}</td>
-                <td><button onclick="deletePerson({{r.recipeId}})">Delete</button></td>
-                <td><a href="/people/{{r.recipeId}}">Update</a></td>
+                <td><form action="/update_recipe/{{r.recipeId}}"><input type="submit" value="Edit" /></form></td>
+                <td><form action="/delete_recipe/{{r.recipeId}}"><input type="submit" value="Delete" /></form></td>
+
             </tr>
             {% endfor %}
         </tbody>
