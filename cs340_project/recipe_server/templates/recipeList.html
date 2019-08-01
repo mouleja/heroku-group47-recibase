@@ -1,27 +1,78 @@
 ﻿<!DOCTYPE html>
 <!-- Adapted from CS340_starter_flask_app -->
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
-    <h3>Current recipes: (Click Name for detailed info)</h3>
 
-    <table border='1'>
-        <thead>
-        <th>Recipe Name</th>
-        <th>User Id</th>
-        <th>Date</th>
-        <th>Source Id</th>
-        </thead>
-        <tbody>
-            {% for r in recipes %}
-            <tr>
-                <td><a href="/show_recipe/{{r.recipeId}}">{{r.name}}</a></td>
-                <td>{{r.userId}}</td>
-                <td>{{r.date}}</td>
-                <td>{{r.sourceId}}</td>
-                <td><form action="/update_recipe/{{r.recipeId}}"><input type="submit" value="Edit" /></form></td>
-                <td><form action="/delete_recipe/{{r.recipeId}}"><input type="submit" value="Delete" /></form></td>
+<head>
+    <title>ReciBase - Recipe List</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css?family=Amatic+SC|Cabin+Sketch|Montserrat|Open+Sans|Philosopher&display=swap" rel="stylesheet">
+</head>
 
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<body>
+    <header>
+        <div>
+            <h1>Recibase</h1>
+
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/get_recipes">Recipes</a></li>
+                    <li><a href="/user_entry">Your Kitchen</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <div class="page-content">
+        <div class="main-page">
+            <h3>Current recipes: (Click Name for detailed info)</h3>
+                <button class="add-btn" id="add-btn"><a href="/user_entry">Add Recipe</a></button>
+            <form action="/search_result" method="get">
+                <div class="search">
+                    <span>Search:</span>
+                    <input type="text" placeholder="Search Recipes" name="search_text">
+                    <select name="search_type" id="search_type">
+                        <option selected value="byRecipe">in recipe names</option>
+                        <option value="byIngredient">in ingredients</option>
+                        <option value="byUsername">in usernames</option>
+                        <option value="bySource">in sources</option>
+                    </select>
+                    <button class="search-btn">Search</button>
+                </div>
+            </form>
+                <div class=table-container>
+                    <table border='1'>
+                        <thead>
+                            <tr>
+                                <th>Recipe Name</th>
+                                <th>User Id</th>
+                                <th>Date</th>
+                                <th>Source Id</th>
+                                <th>Edit</th>
+                                <th>Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in recipes %}
+                            <tr>
+                                <td><a href="/show_recipe/{{r.recipeId}}">{{r.name}}</a></td>
+                                <td>{{r.userId}}</td>
+                                <td>{{r.date.strftime("%m-%d-%Y")}}</td>
+                                <td>{{r.sourceId}}</td>
+                                <td><form action="/update_recipe/{{r.recipeId}}"><input type="submit" value="Edit" /></form></td>
+                                <td><form action="/delete_recipe/{{r.recipeId}}"><input type="submit" value="Delete" /></form></td>
+
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+        </div>
+    </div>
+    <footer>
+        <h5>BetaBase Softworks</h5>
+    </footer>
+</body>
+
+
+
 </html>

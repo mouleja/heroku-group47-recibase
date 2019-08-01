@@ -1,0 +1,81 @@
+<!--*****************************************************************************************
+* CSS 340 - Databases
+* Author: 	Tommy Armstrong Jason Moule
+* Date:		7/28/2019
+* Description: 	This is the HTML file that contains the homepage for viewing recipes as part 
+*				of our recipe database project.
+********************************************************************************************** !-->
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Recibase</title>
+	<link rel="stylesheet" href="style.css">
+	<link href="https://fonts.googleapis.com/css?family=Amatic+SC|Cabin+Sketch|Montserrat|Open+Sans|Philosopher&display=swap" rel="stylesheet">
+</head>
+<body>
+	<header>
+		<div>
+			<h1>Recibase</h1>
+			<nav>
+				<ul>
+					<li><a href="#">About</a></li>
+					<li><a href="index.html">Recipes</a></li>
+					<li><a href="#">Your Kitchen</a></li>
+				</ul>
+			</nav>
+		</div>
+	</header>
+	<div class="page-content">
+		<div class="main-page">
+			<h1>Recipe List:</h1>
+			<form>
+				<button class="add-btn" id="add-btn"><a href="addRecipe.html">Add Recipe</a></button>
+				<div class="search">
+					<span>Search:</span><input type="text" placeholder="Search Recipes"><button class="search-btn">Search</button>
+				</div>
+				<div class=table-container>
+					<table>
+						<thead>
+							<tr>
+								<th>Name</th><th>Posted By</th><th>Rating</th><th>Edit</th><th>Delete</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>Quinoa Chicken</td>
+								<td>Tommy Armstrong</td>
+								<td>4.3</td>
+								<td><button><a href="editRecipe.html">Edit</a></button></td>
+								<td><button>Delete</button></td>
+							</tr>
+							<tr>
+								<td>Grilled Pickle Sandwich</td>
+								<td>Jason Moule</td>
+								<td>5.0</td>
+								<td><button><a href="editRecipe.html">Edit</a></button></td>
+								<td><button>Delete</button></td>
+							</tr>
+							<tr>
+								<td>Grilled Pickle Sandwich</td>
+								<td>Jason Moule</td>
+								<td>5.0</td>
+								<td><button><a href="editRecipe.html">Edit</a></button></td>
+								<td><button>Delete</button></td>
+							</tr>
+							<tr>
+								<td>Quinoa Chicken</td>
+								<td>Tommy Armstrong</td>
+								<td>4.3</td>
+								<td><button><a href="editRecipe.html">Edit</a></button></td>
+								<td><button>Delete</button></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</form>
+		</div>
+	</div>
+</body>
+</html>
