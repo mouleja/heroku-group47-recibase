@@ -79,44 +79,6 @@ def show_recipe(id):
     #return redirect('/')
     return 'Something went wrong in show_recipe!'
         
-@app.route('/update_recipe/<int:id>')
-def update_recipe(id):
-
-    try:
-        conn = mysql.connect()
-        cursor = conn.cursor(pymysql.cursors.DictCursor)
-        cursor.execute(
-            '''SELECT r.name rname, r.date, u.name uname, s.name sname FROM Recipe r
-            INNER JOIN User u ON u.userId = r.userId
-            INNER JOIN Source s ON s.sourceId = r.sourceId
-            WHERE r.recipeId = %s''', (id,)
-        )
-        recipeInfo = cursor.fetchone() or {'rname':'Error'}
-
-        cursor.execute(
-            '''SELECT i.name, ri.amount, ri.unit, ri.preperation
-            FROM Recipe_Ingredient ri
-            INNER JOIN Ingredient i ON i.ingredientId = ri.ingredientId
-            WHERE ri.recipeId = %s''', (id,)
-        )
-        ingredients = cursor.fetchall() or [{'name': 'ERROR'}]
-
-        cursor.execute(
-            '''SELECT instruction FROM Step WHERE recipeId = %s''', (id,)
-        )
-        steps = cursor.fetchall() or [{'instruction': 'ERROR'}]
-
-        print("Updating recipe details:", recipeInfo, ingredients, steps)
-        return render_template('update_recipe.html', recipeInfo=recipeInfo,
-                               ingredients=ingredients, steps=steps)
-    except Exception as e:
-        print("Error getting recipe",id, e)
-    finally:
-        cursor.close() 
-        conn.close()
-
-    return 'Something went wrong in update_recipe!'
-
 @app.route('/delete_recipe/<int:id>')
 def delete_recipe(id):
 
@@ -236,6 +198,8 @@ def user_page():
         cursor.execute('SELECT * FROM Recipe WHERE userId = %s', (user['userId'],))
         recipes = cursor.fetchall()
 
+        print("Going to user page for", username)
+
         return render_template('user_page.html', user=user, recipes=recipes)
     
     except Exception as e:
@@ -306,6 +270,53 @@ def delete_user():
     userId = request.form['userId']
     username = request.form['username']
     return render_template('confirm_delete.html', userId=userId, username=username, deleteType='user')
+
+@app.route('/update_recipe', methods=['POST'])
+def update_recipe():
+    userId = request.form.get("userId")
+    recipeId = request.form.get("recipeId")
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        cursor.execute(
+            '''SELECT r.recipeId, r.name rname, r.date, u.name uname, s.name sname FROM Recipe r
+            INNER JOIN User u ON u.userId = r.userId
+            INNER JOIN Source s ON s.sourceId = r.sourceId
+            WHERE r.recipeId = %s''', (recipeId,)
+        )
+        recipe = cursor.fetchone()
+
+        cursor.execute(
+            '''SELECT i.ingredientId, i.name, ri.amount, ri.unit, ri.preperation
+            FROM Recipe_Ingredient ri
+            INNER JOIN Ingredient i ON i.ingredientId = ri.ingredientId
+            WHERE ri.recipeId = %s''', (recipeId,)
+        )
+        ingredients = cursor.fetchall()
+
+        cursor.execute('SELECT step, instruction FROM Step WHERE recipeId = %s', (recipeId,))
+        steps = cursor.fetchall()
+
+        cursor.execute('SELECT sourceId, name FROM Source')
+        sourceList = cursor.fetchall()
+
+        cursor.execute('SELECT ingredientId, name FROM Ingredient')
+        ingredientList = cursor.fetchall()
+
+        print("Updating recipe details:", recipe)
+        print(ingredients)
+        print(steps)
+        print(sourceList)
+        print(ingredientList)
+        return render_template('update_recipe.html', recipe=recipe, ingredients=ingredients, steps=steps, sourceList=sourceList, ingredientList=ingredientList)
+
+    except Exception as e:
+        print("Error getting recipe",id, e)
+    finally:
+        cursor.close() 
+        conn.close()
+
+    return 'Something went wrong in update_recipe!'
 
 
 @app.route('/')

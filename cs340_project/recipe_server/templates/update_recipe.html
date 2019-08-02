@@ -3,7 +3,7 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
-    <title>ReciBase - Edit {{recipeInfo.rname}}</title>
+    <title>ReciBase - Edit {{recipe.rname}}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://fonts.googleapis.com/css?family=Amatic+SC|Cabin+Sketch|Montserrat|Open+Sans|Philosopher&display=swap" rel="stylesheet">
 </head>
@@ -24,27 +24,119 @@
     </header>
     <div class="page-content">
         <div class="main-page">
-            <h2> Edit Recipe - (Work in progress)</h2>
+            <h2> Edit Recipe:</h2>
             <div>
-                <h2>{{recipeInfo.rname}}</h2>
-                <h3>Submitted by {{recipeInfo.uname}} on {{recipeInfo.date.strftime("%m-%d-%Y")}}</h3>
-                <h4>{% if recipeInfo.sname %} Source: {{recipeInfo.sname}} {% endif %}</h4>
+                <form action="change_recipe" method="post">
+                    <label>Recipe Name: </label>
+                    <input type="hidden" name="changeType" value="name" />
+                    <input type="hidden" name="recipeId" value="{{recipe.recipeId}}" />
+                    <input type="text" name="recipeName" value="{{recipe.rname}}" />
+                    <input type="submit" value="Edit Name" />
+                </form>
+                <br />
+                <form action="change_recipe" method="post">
+                    <label>Source: </label>
+                    <input type="hidden" name="changeType" value="change_source" />
+                    <input type="hidden" name="recipeId" value="{{recipe.recipeId}}" />
+                    <select name="source">
+                        {% for s in sourceList %}
+                        <option value="{{s.sourceId}}">{{s.name}}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="submit" value="Edit Source" />
+                </form>
+                <br />
+                <form action="change_recipe" method="post">
+                    <label>Add New Source: </label>
+                    <input type="hidden" name="changeType" value="add_source" />
+                    <input type="hidden" name="recipeId" value="{{recipe.recipeId}}" />
+                    <input type="text" name="source" placeholder="New Source Name" />
+                    <input type="text" name="url" placeholder="Source URL (optional)" />
+                    <input type="submit" value="Add New Source" />
+                </form>
 
                 <hr />
                 <h3>Ingredients:</h3>
                 <ul>
                     {% for i in ingredients %}
-                    <li>{{i.amount}} {{i.unit}} of {{i.name}} {% if i.preperation %}({{i.preperation}}){% endif %}</li>
+                    <li>
+                        <form action="change_recipe" method="post">
+                            <label>{{i.name}}</label>
+                            <input type="hidden" name="changeType" value="change_ingredient" />
+                            <input type="hidden" name="recipeId" value="{{recipe.recipeId}}" />
+                            <input type="hidden" name="ingredientId" value="{{i.ingredientId}}" />
+                            <input type="text" name="amount" value="{{i.amount}}" />
+                            <input type="text" name="unit" value="{{i.unit}}" />
+                            <input type="text" name="preperation" value="{{i.preperation}}" />
+                            <input type="submit" name="action" value="Edit" />
+                            <input type="submit" name="action" value="Delete" />
+                        </form>
+                    </li>
                     {% endfor %}
-                </ul>
+                </ul><br />
+                <form action="change_recipe" method="post">
+                    <label>Add Ingredient: </label>
+                    <input type="hidden" name="changeType" value="add_ingredient" />
+                    <input type="hidden" name="recipeId" value="{{recipe.recipeId}}" />
+                    <select name="ingredientId">
+                        {% for i in ingredientList %}
+                        <option value="{{i.ingredientId}}">{{i.name}}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="number" step="0.01" name="amount" placeholder="Amount" />
+                    <input type="text" name="unit" placeholder="Units" />
+                    <input type="text" name="preperation" placeholder="Preperation (optional)" />
+                    <input type="submit" value="Add Ingredient" />
+                </form><br />
+
+                <form action="change_recipe" method="post">
+                    <label>Add A New Ingredient: </label>
+                    <input type="hidden" name="changeType" value="add_new_ingredient" />
+                    <input type="hidden" name="recipeId" value="{{recipe.recipeId}}" />
+                    <input type="text" name="ingredientName" placeholder="Ingredient Name" />
+                    <input type="number" step="0.01" name="amount" placeholder="Amount" />
+                    <input type="text" name="unit" placeholder="Units" />
+                    <input type="text" name="preperation" placeholder="Preperation (optional)" /><br />
+                    <input type="number" step="0.01" name="defaultAmount" placeholder="Default Amount (optional)" />
+                    <input type="text" name="defaultUnit" placeholder="Default Units (optional)" />
+                    <input type="number" name="calories" placeholder="Calories (optional)" />
+                    <input type="submit" value="Add A New Ingredient" />
+                </form><br />
+
 
                 <hr />
                 <h3>Steps:</h3>
                 <ol>
                     {% for s in steps %}
-                    <li>{{s.instruction}}</li>
+                    <li>
+                        <form action="change_recipe" method="post">
+                            <input type="hidden" name="changeType" value="edit_step" />
+                            <input type="hidden" name="recipeId" value="{{recipe.recipeId}}" />
+                            <input type="hidden" name="step" value="{{s.step}}" />
+                            <textarea name="instruction">{{s.instruction}}</textarea>
+                            <input type="submit" name="action" value="Edit" />
+                        </form>
+                    </li>
                     {% endfor %}
                 </ol>
+
+                <form action="change_recipe" method="post">
+                    <label>Delete Last Step: </label>
+                    <input type="hidden" name="changeType" value="delete_step" />
+                    <input type="hidden" name="recipeId" value="{{recipe.recipeId}}" />
+                    <input type="hidden" name="step" value="{{steps[-1]['step']}}" />
+                    <input type="submit" value="Delete" />
+                </form>
+
+                <form action="change_recipe" method="post">
+                    <label>Add A New Step: </label>
+                    <input type="hidden" name="changeType" value="add_step" />
+                    <input type="hidden" name="recipeId" value="{{recipe.recipeId}}" />
+                    <input type="hidden" name="step" value="{{steps[-1]['step'] + 1}}" />
+                    <textarea name="instruction">Enter new instruction here ...</textarea>
+                    <input type="submit" value="Add A New Step" />
+                </form>
+
                 <hr />
                 <h3><a href="/get_recipes">Back to Recipes</a></h3>
             </div>
