@@ -44,23 +44,18 @@
                         <thead>
                             <tr>
                                 <th>Recipe Name</th>
-                                <th>User Id</th>
+                                <th>User Name</th>
                                 <th>Date</th>
-                                <th>Source Id</th>
-                                <th>Edit</th>
-                                <th>Delete</th>
+                                <th>Source</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for r in recipes %}
                             <tr>
-                                <td><a href="/show_recipe/{{r.recipeId}}">{{r.name}}</a></td>
-                                <td>{{r.userId}}</td>
+                                <td><a href="/show_recipe/{{r.recipeId}}">{{r.recipeName}}</a></td>
+                                <td>{{r.username}}</td>
                                 <td>{{r.date.strftime("%m-%d-%Y")}}</td>
-                                <td>{{r.sourceId}}</td>
-                                <td><form action="/update_recipe/{{r.recipeId}}"><input type="submit" value="Edit" /></form></td>
-                                <td><form action="/delete_recipe/{{r.recipeId}}"><input type="submit" value="Delete" /></form></td>
-
+                                <td>{{r.sourceName}}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
