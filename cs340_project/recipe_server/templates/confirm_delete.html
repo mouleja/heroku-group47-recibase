@@ -31,22 +31,22 @@
                 <form action="/delete" method="post">
                     <label>(You must enter your password to confirm)</label>
                     <input type="hidden" name="deleteType" value="{{deleteType}}" />
-                    <input type="hidden" name="id" value="{{recipeId}}" />
-                    <input type="password" name="password" placeholder="password" />
+                    <input type="hidden" name="userId" value="{{user.userId}}" />
+                    <input type="hidden" name="recipeId" value="{{recipe.recipeId}}" />
+                    <input type="password" name="password" required placeholder="password" />
                     <input type="submit" value="DELETE" />
                 </form>
                 <br />
-                <h4>Delete not actually functional at this point</h4>
             </div>
             {% elif deleteType == 'user' %}
-            <h2>Are you sure you want to delete user: {{username}}?</h2>
+            <h2>Are you sure you want to delete user: {{user.name}}?</h2>
             <div>
                 <form action="/delete" method="post">
                     <label>(You must enter your password to confirm)</label>
                     <input type="hidden" name="deleteType" value="{{deleteType}}" />
-                    <input type="hidden" name="userId" value="{{userId}}" />
-                    <input type="hidden" name="username" value="{{username}}" />
-                    <input type="password" name="password" placeholder="password" />
+                    <input type="hidden" name="userId" value="{{user.userId}}" />
+                    <input type="hidden" name="username" value="{{user.name}}" />
+                    <input type="password" name="password" required placeholder="password" />
                     <input type="submit" value="DELETE" />
                 </form>
                 <br />

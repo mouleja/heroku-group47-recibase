@@ -1,0 +1,91 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>ReciBase - {{recipe.name}} - Add Details</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css?family=Amatic+SC|Cabin+Sketch|Montserrat|Open+Sans|Philosopher&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <div>
+            <h1>Recibase</h1>
+
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/get_recipes">Recipes</a></li>
+                    <li><a href="/user_entry">Your Kitchen</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <div class="page-content">
+        <div class="main-page">
+            <h1>{{recipe.name}}</h1>
+            <h2>Ingredients:</h2>
+            <ul>
+                {% for i in ingredients %}
+                <li>{{i.amount}} {{i.unit}} of {{i.name}} {% if i.preperation %}({{i.preperation}}){% endif %}</li>
+                {% endfor %}
+            </ul><br />
+
+            <div>
+                <form action="/add_recipe_ingredient" method="post">
+                    <label for="ingredient">Add Ingredient from List:</label><br />
+                    <input type="hidden" name="userId" value="{{recipe.userId}}" />
+                    <input type="hidden" name="recipeId" value="{{recipe.recipeId}}" />
+                    <select name="ingredient">
+                        {% for i in ingredientList %}
+                        <option value="{{i.ingredientId}}">{{i.name}}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="number" step="0.01" name="amount" required placeholder="Amount" />
+                    <input type="text" name="unit" required placeholder="Unit" />
+                    <input type="text" name="preperation" placeholder="Preperation (optional)" /><br />
+                    <input type="submit" value="Add ingredient from list" />
+                </form><br />
+
+                <form action="/add_recipe_new_ingredient" method="post">
+                    <label for="ingredient">Add New Ingredient:</label><br />
+                    <input type="hidden" name="userId" value="{{recipe.userId}}" />
+                    <input type="hidden" name="recipeId" value="{{recipe.recipeId}}" />
+                    <input type="text" name="ingredientName" required placeholder="Ingredient Name" />
+                    <input type="number" step="0.01" name="amount" required placeholder="Amount" />
+                    <input type="text" name="unit" required placeholder="Unit" />
+                    <input type="text" name="preperation" placeholder="Preperation (optional)" />
+                    <br />
+                    <input type="number" step="0.01" name="defaultAmount" placeholder="Default Amount (optional)" />
+                    <input type="text" name="defaultUnit" placeholder="Default Unit (optional)" />
+                    <input type="number" name="calories" placeholder="Calories (optional)" /><br />
+                    <input type="submit" value="Add New Ingredient" />
+                </form><br />
+            </div>
+
+            <h2>Instructions:</h2>
+            <ol>
+                {% for s in steps %}
+                <li>{{s.instruction}}</li>
+                {% endfor %}
+            </ol><br />
+
+            <div>
+                <form action="/add_recipe_step" method="post">
+                    <label for="ingredient">Add New Instruction: </label><br />
+                    <input type="hidden" name="userId" value="{{recipe.userId}}" />
+                    <input type="hidden" name="recipeId" value="{{recipe.recipeId}}" />
+                    <input type="hidden" name="step" value="{{steps[-1]['step'] + 1 if steps else 1}}" />
+                    <textarea name="instruction" required>Add new instruction here ...</textarea><br />
+                    <input type="submit" value="Add instruction" />
+                </form><br />
+            </div>
+        </div>
+    </div>
+    <footer>
+        <h5>BetaBase Softworks</h5>
+    </footer>
+</body>
+
+</html>

@@ -26,6 +26,16 @@
         <div class="main-page">
             <h2>Welcome {{user.name}}!</h2>
             <h3>Your recipes: (Click Name for detailed info)</h3>
+
+            <div>
+                <form action="/add_recipe_initial" method="post">
+                    <input type="hidden" name="userId" value="{{user.userId}}" />
+                    <input type="hidden" name="username" value="{{user.name}}" />
+                    <input type="submit" value="Create A New Recipe!" />
+                </form>
+            </div>
+            <br />
+
             <div class=table-container>
                 <table border='1'>
                     <thead>
@@ -62,9 +72,6 @@
                 </table>
             </div>
             <hr />
-
-            <button class="add-btn" id="add-btn"><a href="/add_recipe?userId={{user.userId}}">Add Recipe</a></button>
-            <br />
 
             {% if usedError %}<h2 class="error_msg">Sorry that name is taken, try again...</h2>{% endif %}
             <form action="/change_username" method="post">

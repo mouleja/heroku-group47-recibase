@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>ReciBase - New Recipe Page</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css?family=Amatic+SC|Cabin+Sketch|Montserrat|Open+Sans|Philosopher&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <div>
+            <h1>Recibase</h1>
+
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/get_recipes">Recipes</a></li>
+                    <li><a href="/user_entry">Your Kitchen</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <div class="page-content">
+        <div class="main-page">
+            <h2>Enter details below, submit to add ingredients and instructions:</h2>
+            <div>
+                <form action="/add_recipe" method="post">
+                    <label for="recipeName">Name: </label>
+                    <input type="hidden" name="userId" value="{{userId}}" />
+                    <input type="text" name="recipeName" required placeholder="Name of Recipe" /><br />
+                    <label for="source">Source:</label>
+                    <select name="source">
+                        <option selected value="no_source">Leave Blank</option>
+                        <option value="new_source">Add a new source</option>
+                        {% for s in sourceList %}
+                        <option value="{{s.sourceId}}">{{s.name}}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="text" name="new_name" placeholder="Add new source name" />
+                    <input type="text" name="new_url" placeholder="Add url for new source (optional)" />
+                    <br />
+                    <input type="submit" value="Add recipe and enter details!" />
+                </form>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <h5>BetaBase Softworks</h5>
+    </footer>
+</body>
+
+</html>

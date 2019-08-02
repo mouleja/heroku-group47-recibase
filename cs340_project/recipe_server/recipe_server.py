@@ -27,7 +27,7 @@ def get_recipes():
             '''SELECT r.recipeId, r.name recipeName, r.date, u.name username, s.name sourceName 
             FROM Recipe r 
             INNER JOIN User u on u.userId = r.userId
-            INNER JOIN Source s on s.sourceId = r.sourceId'''
+            LEFT JOIN Source s on s.sourceId = r.sourceId'''
         )
         result = cursor.fetchall() or {'text':'Nothing in recipe!!'}
         print("Getting all recipes.")
@@ -49,7 +49,7 @@ def show_recipe(id):
         cursor.execute(
             '''SELECT r.name rname, r.date, u.name uname, s.name sname FROM Recipe r
             INNER JOIN User u ON u.userId = r.userId
-            INNER JOIN Source s ON s.sourceId = r.sourceId
+            LEFT JOIN Source s ON s.sourceId = r.sourceId
             WHERE r.recipeId = %s''', (id,)
         )
         recipeInfo = cursor.fetchone() or {'rname':'Error'}
@@ -60,12 +60,12 @@ def show_recipe(id):
             INNER JOIN Ingredient i ON i.ingredientId = ri.ingredientId
             WHERE ri.recipeId = %s''', (id,)
         )
-        ingredients = cursor.fetchall() or [{'name': 'ERROR'}]
+        ingredients = cursor.fetchall()
 
         cursor.execute(
             '''SELECT instruction FROM Step WHERE recipeId = %s''', (id,)
         )
-        steps = cursor.fetchall() or [{'instruction': 'ERROR'}]
+        steps = cursor.fetchall()
 
         print("Getting recipe details:", recipeInfo, ingredients, steps)
         return render_template('recipeDetails.html', recipeInfo=recipeInfo,
@@ -79,21 +79,21 @@ def show_recipe(id):
     #return redirect('/')
     return 'Something went wrong in show_recipe!'
         
-@app.route('/delete_recipe/<int:id>')
-def delete_recipe(id):
-
+@app.route('/delete_recipe', methods=['POST'])
+def delete_recipe():
+    userId = request.form.get("userId")
+    recipeId = request.form.get("recipeId")
+    user = {'userId' : userId, 'name' : request.form.get('username')}
     try:
         conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
-        cursor.execute(
-            '''SELECT r.name FROM Recipe r WHERE r.recipeId = %s''', (id,)
-        )
-        recipe = cursor.fetchone() or {'rname':'Error'}
+        cursor.execute('SELECT recipeId, name FROM Recipe WHERE recipeId = %s', (recipeId,))
+        recipe = cursor.fetchone()
 
         print("Delete recipe?", recipe)
-        return render_template('confirm_delete.html', recipe=recipe, recipeId=id, deleteType='recipe')
+        return render_template('confirm_delete.html', recipe=recipe, user = user, deleteType='recipe')
     except Exception as e:
-        print("Error getting recipe",id, e)
+        print("Error deleting recipe", recipeId, e)
     finally:
         cursor.close() 
         conn.close()
@@ -114,11 +114,14 @@ def delete():
         cursor.execute('SELECT * FROM User WHERE userId = %s and password = %s', (userId, password))
         checkpw = cursor.fetchone() # True if password wrong
         if not checkpw:
+            user = {'userId' : userId, 'name' : username}
             return render_template('confirm_delete.html', 
-                    userId=userId, deleteType=deleteType, recipeId=recipeId, username=username, pwError = True)
+                    user=user, deleteType=deleteType, recipeId=recipeId, pwError = True)
 
         if deleteType == 'recipe':
             print("Delete processed for recipe id #", recipeId)
+            cursor.execute('DELETE FROM Recipe WHERE recipeId = %s', (recipeId,))
+            conn.commit()
             return redirect("/get_recipes")
 
         if deleteType == 'user':
@@ -281,7 +284,7 @@ def update_recipe():
         cursor.execute(
             '''SELECT r.recipeId, r.name rname, r.date, u.name uname, s.name sname FROM Recipe r
             INNER JOIN User u ON u.userId = r.userId
-            INNER JOIN Source s ON s.sourceId = r.sourceId
+            LEFT JOIN Source s ON s.sourceId = r.sourceId
             WHERE r.recipeId = %s''', (recipeId,)
         )
         recipe = cursor.fetchone()
@@ -308,7 +311,8 @@ def update_recipe():
         print(steps)
         print(sourceList)
         print(ingredientList)
-        return render_template('update_recipe.html', recipe=recipe, ingredients=ingredients, steps=steps, sourceList=sourceList, ingredientList=ingredientList)
+        return render_template('update_recipe.html', recipe=recipe, ingredients=ingredients, 
+                               steps=steps, sourceList=sourceList, ingredientList=ingredientList)
 
     except Exception as e:
         print("Error getting recipe",id, e)
@@ -318,11 +322,218 @@ def update_recipe():
 
     return 'Something went wrong in update_recipe!'
 
+@app.route("/add_recipe_initial", methods=["POST"])
+def add_recipe_initial():
+    userId = request.form.get("userId")
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        cursor.execute('SELECT sourceId, name FROM Source')
+        sourceList = cursor.fetchall()
+
+        return render_template('add_recipe_initial.html', userId=userId, sourceList=sourceList)
+    
+    except Exception as e:
+        print("Error adding recipe -", e)
+    finally:
+        cursor.close() 
+        conn.close()
+
+    return 'Something went wrong in add_recipe_initial!'
+
+@app.route('/add_recipe', methods=['POST'])
+def add_recipe():
+    userId = request.form.get("userId")
+    recipeName = request.form.get("recipeName")
+    source = request.form.get('source')
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+        if source == 'no_source':
+            source = None
+        elif source == 'new_source':
+            new_name = request.form.get("new_name")
+            if not new_name:    # treat new_source with no new_name as NULL source
+                source = None
+            else:
+                cursor.execute('INSERT INTO Source (name, url) VALUES (%s, %s)',
+                               (new_name, request.form.get('new_url')))
+                conn.commit()
+                cursor.execute('SELECT sourceId FROM Source WHERE name = %s', (new_name,))
+                source = cursor.fetchone()['sourceId']
+
+        cursor.execute('INSERT INTO Recipe (name, userId, sourceId) VALUES (%s, %s, %s)',
+                               (recipeName, userId, source))
+        conn.commit()
+        cursor.execute('SELECT * FROM Recipe WHERE name = %s and userId = %s', (recipeName, userId))
+        recipe = cursor.fetchall()[-1]  # No uniqueness requirement for recipe name, get last
+
+        cursor.execute('SELECT ingredientId, name FROM Ingredient')
+        ingredientList = cursor.fetchall()
+
+        return render_template('add_recipe_details.html', recipe=recipe, ingredients = [], 
+                               steps = [], ingredientList = ingredientList)
+    
+    except Exception as e:
+        print("Error adding recipe -", recipeName, e)
+    finally:
+        cursor.close() 
+        conn.close()
+
+    return 'Something went wrong in add_recipe!'
+
+@app.route('/add_recipe_ingredient', methods=['POST'])
+def add_recipe_ingredient():
+    recipeId = request.form.get("recipeId")
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+        print("Adding ingredient to", recipeId, request.form.get('ingredient'), request.form.get('amount'), request.form.get('unit'), request.form.get('preperation'))
+
+        cursor.execute(
+            '''INSERT INTO Recipe_Ingredient (recipeId, ingredientId, amount, unit, preperation)
+            VALUES (%s, %s, %s, %s, %s)''',
+                (recipeId, request.form.get('ingredient'), request.form.get('amount'), 
+                 request.form.get("unit"), request.form.get("preperation")))
+        conn.commit()
+
+        cursor.execute('SELECT * FROM Recipe WHERE recipeId = %s', (recipeId,))
+        recipe = cursor.fetchone()
+
+        cursor.execute('SELECT ingredientId, name FROM Ingredient')
+        ingredientList = cursor.fetchall()
+
+        cursor.execute(
+        '''SELECT i.name, ri.amount, ri.unit, ri.preperation
+            FROM Recipe_Ingredient ri
+            INNER JOIN Ingredient i ON i.ingredientId = ri.ingredientId
+            WHERE ri.recipeId = %s''', (recipeId,)
+        )
+        ingredients = cursor.fetchall()
+
+        cursor.execute(
+            '''SELECT step, instruction FROM Step WHERE recipeId = %s''', (recipeId,)
+        )
+        steps = cursor.fetchall()
+
+        return render_template('add_recipe_details.html', recipe=recipe, ingredients = ingredients, 
+                               steps = steps, ingredientList = ingredientList)
+    
+    except Exception as e:
+        print("Error adding recipe ingredient", recipeId, e)
+    finally:
+        cursor.close() 
+        conn.close()
+
+    return 'Something went wrong in add_recipe_ingredient!'
+
+@app.route('/add_recipe_new_ingredient', methods=['POST'])
+def add_recipe_new_ingredient():
+    recipeId = request.form.get("recipeId")
+    ingredientName = request.form.get('ingredientName')
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+        print("Adding new ingredient to", recipeId, request.form.get('ingredientName'), request.form.get('amount'), request.form.get('unit'), request.form.get('preperation'))
+
+        cursor.execute(
+            '''INSERT INTO Ingredient (name, defaultAmount, defaultUnit, calories)
+            VALUES (%s, %s, %s, %s)''',
+                (ingredientName, request.form.get("defaultAmount"), request.form.get("defaultUnit"), 
+                 request.form.get("calories")))
+        conn.commit()
+
+        cursor.execute('SELECT ingredientId FROM Ingredient WHERE name = %s', (ingredientName,))
+        newId = cursor.fetchall()[-1]['ingredientId']  # No uniqueness requirement for ingredient name, get last
+
+        cursor.execute(
+            '''INSERT INTO Recipe_Ingredient (recipeId, ingredientId, amount, unit, preperation)
+            VALUES (%s, %s, %s, %s, %s)''',
+                (recipeId, newId, request.form.get('amount'), 
+                 request.form.get("unit"), request.form.get("preperation")))
+        conn.commit()
+
+        cursor.execute('SELECT * FROM Recipe WHERE recipeId = %s', (recipeId,))
+        recipe = cursor.fetchone()
+
+        cursor.execute('SELECT ingredientId, name FROM Ingredient')
+        ingredientList = cursor.fetchall()
+
+        cursor.execute(
+        '''SELECT i.name, ri.amount, ri.unit, ri.preperation
+            FROM Recipe_Ingredient ri
+            INNER JOIN Ingredient i ON i.ingredientId = ri.ingredientId
+            WHERE ri.recipeId = %s''', (recipeId,)
+        )
+        ingredients = cursor.fetchall()
+
+        cursor.execute(
+            '''SELECT step, instruction FROM Step WHERE recipeId = %s''', (recipeId,)
+        )
+        steps = cursor.fetchall()
+
+        return render_template('add_recipe_details.html', recipe=recipe, ingredients = ingredients, 
+                               steps = steps, ingredientList = ingredientList)
+    
+    except Exception as e:
+        print("Error adding recipe ingredient", recipeId, e)
+    finally:
+        cursor.close() 
+        conn.close()
+
+    return 'Something went wrong in add_recipe_ingredient!'
+
+@app.route('/add_recipe_step', methods=['POST'])
+def add_recipe_step():
+    recipeId = request.form.get("recipeId")
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+        print("Adding step to", recipeId, request.form.get('step'), request.form.get('instruction'))
+
+        cursor.execute('INSERT INTO Step (recipeId, step, instruction) VALUES (%s, %s, %s)',
+                (recipeId, request.form.get('step'), request.form.get('instruction')))
+        conn.commit()
+
+        cursor.execute('SELECT * FROM Recipe WHERE recipeId = %s', (recipeId,))
+        recipe = cursor.fetchone()
+
+        cursor.execute('SELECT ingredientId, name FROM Ingredient')
+        ingredientList = cursor.fetchall()
+
+        cursor.execute(
+        '''SELECT i.name, ri.amount, ri.unit, ri.preperation
+            FROM Recipe_Ingredient ri
+            INNER JOIN Ingredient i ON i.ingredientId = ri.ingredientId
+            WHERE ri.recipeId = %s''', (recipeId,)
+        )
+        ingredients = cursor.fetchall()
+
+        cursor.execute(
+            '''SELECT step, instruction FROM Step WHERE recipeId = %s''', (recipeId,)
+        )
+        steps = cursor.fetchall()
+
+        return render_template('add_recipe_details.html', recipe=recipe, ingredients = ingredients, 
+                               steps = steps, ingredientList = ingredientList)
+    
+    except Exception as e:
+        print("Error adding recipe step", recipeId, e)
+    finally:
+        cursor.close() 
+        conn.close()
+
+    return 'Something went wrong in add_recipe_step!'
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
+########################################
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=6778)
 

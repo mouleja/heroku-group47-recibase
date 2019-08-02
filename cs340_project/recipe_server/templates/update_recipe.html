@@ -120,6 +120,7 @@
                     {% endfor %}
                 </ol>
 
+                {% if steps %}
                 <form action="change_recipe" method="post">
                     <label>Delete Last Step: </label>
                     <input type="hidden" name="changeType" value="delete_step" />
@@ -127,12 +128,13 @@
                     <input type="hidden" name="step" value="{{steps[-1]['step']}}" />
                     <input type="submit" value="Delete" />
                 </form>
+                {% endif %}
 
                 <form action="change_recipe" method="post">
                     <label>Add A New Step: </label>
                     <input type="hidden" name="changeType" value="add_step" />
                     <input type="hidden" name="recipeId" value="{{recipe.recipeId}}" />
-                    <input type="hidden" name="step" value="{{steps[-1]['step'] + 1}}" />
+                    <input type="hidden" name="step" value="{{steps[-1]['step'] + 1 if steps else 1}}" />
                     <textarea name="instruction">Enter new instruction here ...</textarea>
                     <input type="submit" value="Add A New Step" />
                 </form>

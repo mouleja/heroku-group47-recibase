@@ -49,6 +49,8 @@
     <Folder Include="recipe_server\templates\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="recipe_server\templates\add_recipe_details.html" />
+    <Content Include="recipe_server\templates\add_recipe_initial.html" />
     <Content Include="recipe_server\templates\confirm_delete.html" />
     <Content Include="recipe_server\templates\index.html" />
     <Content Include="recipe_server\templates\recipeList.html" />
