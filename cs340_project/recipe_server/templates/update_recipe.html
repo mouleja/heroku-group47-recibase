@@ -121,7 +121,7 @@
                             <input type="hidden" name="changeType" value="edit_step" />
                             <input type="hidden" name="recipeId" value="{{recipe.recipeId}}" />
                             <input type="hidden" name="step" value="{{s.step}}" />
-                            <textarea name="instruction">{{s.instruction}}</textarea>
+                            <textarea name="instruction" required>{{s.instruction}}</textarea>
                             <input type="submit" name="action" value="Edit" />
                         </form>
                     </li>
@@ -143,7 +143,7 @@
                     <input type="hidden" name="changeType" value="add_step" />
                     <input type="hidden" name="recipeId" value="{{recipe.recipeId}}" />
                     <input type="hidden" name="step" value="{{steps[-1]['step'] + 1 if steps else 1}}" />
-                    <textarea name="instruction">Enter new instruction here ...</textarea>
+                    <textarea name="instruction" required placeholder="Enter new instruction here ..." ></textarea>
                     <input type="submit" value="Add A New Step" />
                 </form>
 

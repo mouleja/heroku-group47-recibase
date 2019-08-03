@@ -77,7 +77,7 @@
                     <input type="hidden" name="userId" value="{{recipe.userId}}" />
                     <input type="hidden" name="recipeId" value="{{recipe.recipeId}}" />
                     <input type="hidden" name="step" value="{{steps[-1]['step'] + 1 if steps else 1}}" />
-                    <textarea name="instruction" required>Add new instruction here ...</textarea><br />
+                    <textarea name="instruction" required placeholder="Add new instruction here ..."></textarea><br />
                     <input type="submit" value="Add instruction" />
                 </form><br />
             </div>
