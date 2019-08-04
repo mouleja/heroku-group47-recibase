@@ -77,7 +77,7 @@ def get_recipes():
             INNER JOIN User u on u.userId = r.userId
             LEFT JOIN Source s on s.sourceId = r.sourceId'''
         )
-        result = cursor.fetchall() or {'text':'Nothing in recipe!!'}
+        result = cursor.fetchall()
         print("Getting all recipes.")
         return render_template('recipeList.html', recipes=result)
     except Exception as e:
@@ -604,6 +604,55 @@ def change_recipe():
         conn.close()
 
     return 'Something went wrong in add_recipe_step!'
+
+@app.route('/search_for', methods=['GET'])
+def search_results():
+    search_type = request.args.get('search_type')
+    search_text = request.args.get('search_text')
+    if not search_type or not search_text:
+        print("Search ERROR", search_type, search_text)
+        return redirect('/get_recipes')
+    print("Searching", search_type, "for", search_text)
+    search_text = '%' + search_text + '%'
+    
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+        query = '''SELECT r.recipeId, r.name recipeName, r.date, u.name username, s.name sourceName 
+        FROM Recipe r INNER JOIN User u ON u.userId = r.userId
+        LEFT JOIN Source s ON s.sourceId = r.sourceId '''
+        
+        if search_type == 'Recipes':
+            query += "WHERE r.name like %s;"
+
+        if search_type == 'Ingredients':
+            query += '''WHERE r.recipeId in (SELECT recipeId FROM Recipe_Ingredient
+            LEFT JOIN Ingredient ON Ingredient.ingredientId = Recipe_Ingredient.ingredientId 
+            WHERE Ingredient.name LIKE %s);'''
+
+        if search_type == 'Usernames':
+            query += 'WHERE u.name LIKE %s;'
+
+        if search_type == 'Sources':
+            query += 'WHERE s.name LIKE %s;'
+
+        cursor.execute(query, (search_text, ))        
+        recipes = cursor.fetchall()
+        search_text = search_text[1:-1]
+
+        return render_template('search_results.html', recipes= recipes, 
+                search_type = search_type, search_text = search_text)
+    
+    except Exception as e:
+        print("Error searching", search_type, search_text, e)
+    finally:
+        cursor.close() 
+        conn.close()
+
+    return 'Something went wrong in search_for!'
+
+
 
 
 @app.route('/')

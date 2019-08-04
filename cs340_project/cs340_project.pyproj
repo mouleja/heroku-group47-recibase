@@ -53,6 +53,7 @@
     <Content Include="recipe_server\templates\add_recipe_initial.html" />
     <Content Include="recipe_server\templates\confirm_delete.html" />
     <Content Include="recipe_server\templates\index.html" />
+    <Content Include="recipe_server\templates\search_results.html" />
     <Content Include="recipe_server\templates\recipeList.html" />
     <Content Include="recipe_server\templates\recipeDetails.html" />
     <Content Include="recipe_server\templates\update_recipe.html" />
