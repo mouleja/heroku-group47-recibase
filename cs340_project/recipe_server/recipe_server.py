@@ -822,9 +822,7 @@ def edit_source():
 
         # Edit Button
         if newName != sourceName:   # check for duplicate name before changing
-            cursor.execute(
-                'SELECT s.name FROM Recipe r LEFT JOIN Source s ON s.sourceId = r.sourceId '
-                'WHERE s.name = %s', (newName,))
+            cursor.execute('SELECT name FROM Source WHERE name = %s', (newName,))
             if cursor.fetchone():   # this is a duplicate
                 s_list = get_admin_sources(cursor)
                 return render_template(
