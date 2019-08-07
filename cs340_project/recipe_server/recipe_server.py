@@ -55,7 +55,7 @@ def get_users_recipes(cursor, userId):
     return recipes
 
 def get_ingredient_list(cursor):
-    cursor.execute('SELECT ingredientId, name FROM Ingredient')
+    cursor.execute('SELECT ingredientId, name FROM Ingredient ORDER BY name')
     ingredientList = cursor.fetchall()
     return ingredientList
 
@@ -64,6 +64,29 @@ def get_basic_recipe(cursor, recipeId):
     recipe = cursor.fetchone()
     return recipe
 
+def get_userlist(cursor):
+    cursor.execute(
+        'SELECT u.*, COUNT(recipeId) num, MAX(r.date) last'
+        ' FROM Recipe r RIGHT JOIN User u ON u.userId = r.userId'
+        ' GROUP BY u.name ORDER BY u.name')
+    userList = cursor.fetchall()
+    return userList
+
+def get_admin_sources(cursor):
+    cursor.execute(
+        'SELECT s.sourceId, s.name, s.url, COUNT(r.recipeId) num FROM Recipe r '
+        'RIGHT JOIN Source s on s.sourceId = r.sourceId '
+        'GROUP BY s.name ORDER BY s.name')
+    s_list = cursor.fetchall()
+    return s_list
+
+def get_admin_ingr(cursor):
+    cursor.execute(
+        'SELECT i.*, COUNT(ri.ingredientId) num FROM Recipe_Ingredient ri '
+        'RIGHT JOIN Ingredient i on i.ingredientId = ri.ingredientId '
+        'GROUP BY i.ingredientId ORDER BY i.name')
+    ingrList = cursor.fetchall()
+    return ingrList
 
 ##########  Routes #########################
 @app.route('/get_recipes')
@@ -115,9 +138,8 @@ def show_recipe(id):
         
 @app.route('/delete_recipe', methods=['POST'])
 def delete_recipe():
-    userId = request.form.get("userId")
+    username = request.form.get("username")
     recipeId = request.form.get("recipeId")
-    user = {'userId' : userId, 'name' : request.form.get('username')}
     try:
         conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
@@ -125,7 +147,8 @@ def delete_recipe():
         recipe = cursor.fetchone()
 
         print("Delete recipe?", recipe)
-        return render_template('confirm_delete.html', recipe=recipe, user = user, deleteType='recipe')
+        return render_template(
+            'confirm_delete.html', recipe=recipe, username = username, deleteType='recipe')
     except Exception as e:
         print("Error deleting recipe", recipeId, e)
     finally:
@@ -136,42 +159,57 @@ def delete_recipe():
 
 @app.route('/delete', methods=['POST'])
 def delete():
-    userId = request.form['userId']
-    password = request.form['password']
-    deleteType = request.form['deleteType']
-    recipeId = request.form.get('recipeId')
+    password = request.form.get('password')
+    deleteType = request.form.get('deleteType')
+    recipe = {'name': request.form.get("recipeName"), 'recipeId': request.form.get('recipeId')}
     username = request.form.get('username')
-    print("Deleting:", deleteType, userId, recipeId, username)
+    toDelete = request.form.get("toDelete")
+    print("Deleting:", deleteType, recipe, username)
     try:
         conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
-        cursor.execute('SELECT * FROM User WHERE userId = %s and password = %s', (userId, password))
+        cursor.execute(
+            'SELECT * FROM User WHERE name = %s and password = %s', (username, password))
         checkpw = cursor.fetchone() # True if password wrong
         if not checkpw:
-            user = {'userId' : userId, 'name' : username}
-            return render_template('confirm_delete.html', 
-                    user=user, deleteType=deleteType, recipeId=recipeId, pwError = True)
+            return render_template(
+                'confirm_delete.html',
+                username=toDelete or username, recipe=recipe, 
+                admin=username if toDelete else None, deleteType=deleteType, pwError = True)
 
         if deleteType == 'recipe':
-            print("Delete processed for recipe id #", recipeId)
-            cursor.execute('DELETE FROM Recipe WHERE recipeId = %s', (recipeId,))
+            print("Delete processed for recipe id #", recipe['recipeId'])
+            cursor.execute('DELETE FROM Recipe WHERE recipeId = %s', (recipe['recipeId'],))
             conn.commit()
-            return redirect("/get_recipes")
+            cursor.execute('SELECT * FROM User WHERE name = %s', (username,))
+            user = cursor.fetchone()
+            recipes = get_users_recipes(cursor, user['userId'])
+            return render_template('user_page.html', user=user, recipes=recipes)
 
         if deleteType == 'user':
-            cursor.execute('DELETE FROM User WHERE userId = %s', (userId,))
+            cursor.execute('DELETE FROM User WHERE name = %s', (username,))
             conn.commit()
-            print("Deleted user", userId, "from the database.")
-            return redirect('/')
+            print("Deleted user", username, "from the database.")
+            return redirect('/get_recipes')
+
+        if deleteType == 'admin_user':
+            if (toDelete == 'Jason' or toDelete == 'Tommy'):
+                return "How dare you!"
+            cursor.execute(
+                'DELETE FROM User WHERE name = %s', 
+                (toDelete,))
+            conn.commit()
+            print("Deleted user", request.form.get("toDelete"), "from the database.")
+            userList = get_userlist(cursor)
+            return render_template('admin_users.html', userList = userList, admin = username)
 
     except Exception as e:
-        print("Error deleting", userId, recipeId, deleteType, e)
+        print("Error deleting", username, recipe, toDelete, deleteType, e)
     finally:
         cursor.close() 
         conn.close()
 
     return 'Something went wrong in delete!'
-
 
 @app.route('/user_entry')
 def user_entry():
@@ -226,7 +264,9 @@ def user_page():
     try:
         conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
-        cursor.execute('SELECT * FROM User WHERE name = %s and password = %s', (username, password))
+        cursor.execute(
+            'SELECT userId, name FROM User WHERE name = %s and password = %s', 
+            (username, password))
         user = cursor.fetchone()
 
         if not user:
@@ -250,7 +290,7 @@ def user_page():
 def change_username():
     userId = request.form['userId']
     newName = request.form['newName']
-    user = {'userId': userId, 'name': newName, 'password': request.form['password']}
+    user = {'userId': userId, 'name': newName}
     try:
         conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
@@ -303,12 +343,14 @@ def change_password():
 def delete_user():
     userId = request.form['userId']
     username = request.form['username']
-    return render_template('confirm_delete.html', user={'userId':userId, 'name':username}, deleteType='user')
+    return render_template('confirm_delete.html', username=username, deleteType='user')
 
 @app.route('/update_recipe', methods=['POST'])
 def update_recipe():
     userId = request.form.get("userId")
     recipeId = request.form.get("recipeId")
+    print("Updating recipe details:", recipeId )
+
     try:
         conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
@@ -321,11 +363,6 @@ def update_recipe():
 
         ingredientList = get_ingredient_list(cursor)
 
-        print("Updating recipe details:", recipe)
-        #print(ingredients)
-        #print(steps)
-        #print(sourceList)
-        #print(ingredientList)
         return render_template('update_recipe.html', recipe=recipe, ingredients=ingredients, 
                 steps=steps, sourceList=sourceList, ingredientList=ingredientList, changeError = '')
 
@@ -372,17 +409,31 @@ def add_recipe():
             if not new_name:    # treat new_source with no new_name as NULL source
                 source = None
             else:
+                cursor.execute('SELECT name FROM Source WHERE name = %s', (new_name,))
+                if cursor.fetchone():   # Source name already exists
+                    sourceList = get_source_list(cursor)
+                    return render_template('add_recipe_initial.html',
+                        userId=userId, sourceList=sourceList, dupSource=True)
+
                 cursor.execute('INSERT INTO Source (name, url) VALUES (%s, %s)',
                                (new_name, request.form.get('new_url')))
                 conn.commit()
                 cursor.execute('SELECT sourceId FROM Source WHERE name = %s', (new_name,))
                 source = cursor.fetchone()['sourceId']
 
+        cursor.execute(
+            'SELECT name FROM Recipe WHERE name = %s and userId = %s', (recipeName, userId))
+        if cursor.fetchone():           # Check for duplicate
+            sourceList = get_source_list(cursor)
+            return render_template(
+                '/add_recipe_initial.html', userId=userId, sourceList=sourceList, dupName=recipeName)
+
         cursor.execute('INSERT INTO Recipe (name, userId, sourceId) VALUES (%s, %s, %s)',
                                (recipeName, userId, source))
-        conn.commit()
+        conn.commit()   # New recipe created
+
         cursor.execute('SELECT * FROM Recipe WHERE name = %s and userId = %s', (recipeName, userId))
-        recipe = cursor.fetchall()[-1]  # No uniqueness requirement for recipe name, get last
+        recipe = cursor.fetchone()
 
         ingredientList = get_ingredient_list(cursor)
 
@@ -437,7 +488,21 @@ def add_recipe_new_ingredient():
         conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
 
-        print("Adding new ingredient to", recipeId, request.form.get('ingredientName'), request.form.get('amount'), request.form.get('unit'), request.form.get('preperation'))
+        print(
+            "Adding new ingredient to", recipeId, ingredientName, request.form.get('amount'), 
+            request.form.get('unit'), request.form.get('preperation'))
+
+        cursor.execute(
+            'SELECT name from Ingredient WHERE name = %s', (ingredientName,))
+        if cursor.fetchone():
+            recipe = get_basic_recipe(cursor, recipeId)
+            ingredientList = get_ingredient_list(cursor)
+            ingredients = get_recipe_ingredients(cursor, recipeId)
+            steps = get_recipe_steps(cursor, recipeId)
+
+            return render_template(
+                'add_recipe_details.html', recipe=recipe, ingredients = ingredients, 
+                steps = steps, ingredientList = ingredientList, dupError = True)
 
         cursor.execute(
             '''INSERT INTO Ingredient (name, defaultAmount, defaultUnit, calories)
@@ -447,7 +512,7 @@ def add_recipe_new_ingredient():
         conn.commit()
 
         cursor.execute('SELECT ingredientId FROM Ingredient WHERE name = %s', (ingredientName,))
-        newId = cursor.fetchall()[-1]['ingredientId']  # No uniqueness requirement for ingredient name, get last
+        newId = cursor.fetchone()['ingredientId'] 
 
         cursor.execute(
             '''INSERT INTO Recipe_Ingredient (recipeId, ingredientId, amount, unit, preperation)
@@ -506,6 +571,7 @@ def change_recipe():
     recipeId = request.form.get("recipeId")
     changeType = request.form.get("changeType")
     source = request.form.get('source')
+    newName = request.form.get("recipeName")
     changeError = ''
     print("Changing:", changeType, recipeId)
     try:
@@ -513,8 +579,22 @@ def change_recipe():
         cursor = conn.cursor(pymysql.cursors.DictCursor)
 
         if changeType == 'name':
+            cursor.execute(
+                'SELECT name FROM Recipe WHERE name = %s and userId ='
+                ' (SELECT userId FROM Recipe WHERE recipeId = %s)', (newName, recipeId))
+            if cursor.fetchone():      # Already has a recipe named that
+                recipe = get_recipe_details(cursor, recipeId)
+                ingredientList = get_ingredient_list(cursor)
+                ingredients = get_recipe_ingredients(cursor, recipeId)
+                steps = get_recipe_steps(cursor, recipeId)
+                sourceList = get_source_list(cursor)
+
+                return render_template('update_recipe.html', recipe=recipe, ingredients=ingredients, 
+                        steps=steps, sourceList=sourceList, ingredientList=ingredientList, 
+                        dupName = True)
+
             cursor.execute('UPDATE Recipe SET name = %s WHERE recipeId = %s',
-                (request.form.get("recipeName"), recipeId))
+                (newName, recipeId))
 
         if changeType == 'change_source':
             cursor.execute('UPDATE Recipe SET sourceId = %s WHERE recipeId = %s',
@@ -613,7 +693,7 @@ def search_results():
         print("Search ERROR", search_type, search_text)
         return redirect('/get_recipes')
     print("Searching", search_type, "for", search_text)
-    search_text = '%' + search_text + '%'
+    search_text = '%' + search_text + '%'   # make search term SQL-compatible for LIKE
     
     try:
         conn = mysql.connect()
@@ -639,7 +719,7 @@ def search_results():
 
         cursor.execute(query, (search_text, ))        
         recipes = cursor.fetchall()
-        search_text = search_text[1:-1]
+        search_text = search_text[1:-1]     # remove % from search term
 
         return render_template('search_results.html', recipes= recipes, 
                 search_type = search_type, search_text = search_text)
@@ -652,9 +732,222 @@ def search_results():
 
     return 'Something went wrong in search_for!'
 
+@app.route('/admin_page', methods=["POST"])
+def admin_page():
+    username = request.form.get("username")
+    password = request.form.get("password")
+    print("Entering admin page",username,password)
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
 
+        cursor.execute(
+            'SELECT name, password, admin FROM User WHERE name = %s',
+            (username,))    
+        admin = cursor.fetchone()
+        print(admin)
 
+        if not admin:
+            return render_template('admin_entry.html', nameError = True)
+        elif admin['password'] != password:
+            return render_template('admin_entry.html', passError = True)
+        elif admin['admin'] == 0:
+            return render_template('admin_entry.html', adminError = True)
 
+        return render_template('admin_page.html', admin = admin['name'])
+    
+    except Exception as e:
+        print("Error on admin_page", username, e)
+    finally:
+        cursor.close() 
+        conn.close()
+
+@app.route('/admin_users', methods=["POST"])
+def admin_users():
+    admin = request.form.get("admin")
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        userList = get_userlist(cursor)
+        return render_template('admin_users.html', admin = admin, userList = userList)
+    
+    except Exception as e:
+        print("Error on admin_users", e)
+    finally:
+        cursor.close() 
+        conn.close()
+
+@app.route('/admin_sources', methods=["POST"])
+def admin_sources():
+    admin = request.form.get("admin")
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        s_list = get_admin_sources(cursor)
+   
+        return render_template('admin_sources.html', admin = admin, s_list = s_list)
+    
+    except Exception as e:
+        print("Error on admin_sources", e)
+    finally:
+        cursor.close() 
+        conn.close()
+
+@app.route('/edit_source', methods=["POST"])
+def edit_source():
+    admin = request.form.get("admin")
+    sourceId = request.form.get("sourceId")
+    sourceName = request.form.get("sourceName")
+    newName = request.form.get("newName")
+    url = request.form.get("url")
+    print("Edit source:", sourceId, sourceName, newName, url)
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+        if request.form.get("action") == 'Delete':  # Delete button
+            cursor.execute(                         # Check in recipes
+                'SELECT sourceId FROM Recipe WHERE sourceId = %s', (sourceId,))
+            if cursor.fetchone():   # Error - source is in some existing recipes
+                s_list = get_admin_sources(cursor)
+                return render_template(
+                    'admin_sources.html', admin = admin, s_list = s_list, inRecipes = True)
+            else:
+                cursor.execute(
+                    'DELETE FROM Source WHERE sourceId = %s', (sourceId,))
+                conn.commit()
+                s_list = get_admin_sources(cursor)
+                return render_template(
+                    'admin_sources.html', admin = admin, s_list = s_list)
+
+        # Edit Button
+        if newName != sourceName:   # check for duplicate name before changing
+            cursor.execute(
+                'SELECT s.name FROM Recipe r LEFT JOIN Source s ON s.sourceId = r.sourceId '
+                'WHERE s.name = %s', (newName,))
+            if cursor.fetchone():   # this is a duplicate
+                s_list = get_admin_sources(cursor)
+                return render_template(
+                    'admin_sources.html', admin = admin, s_list = s_list, dupName = True)
+
+        cursor.execute(
+            'UPDATE Source SET name = %s, url = %s WHERE sourceId = %s',
+            (newName, url, sourceId))
+        conn.commit()
+        s_list = get_admin_sources(cursor)
+   
+        return render_template('admin_sources.html', admin = admin, s_list = s_list)
+    
+    except Exception as e:
+        print("Error on edit_source", e)
+    finally:
+        cursor.close() 
+        conn.close()
+
+@app.route('/admin_ingr', methods=["POST"])
+def admin_ingr():
+    admin = request.form.get("admin")
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        ingrList = get_admin_ingr(cursor)
+
+        return render_template('admin_ingr.html', admin = admin, ingrList = ingrList)
+    
+    except Exception as e:
+        print("Error on admin_ingr", e)
+    finally:
+        cursor.close() 
+        conn.close()
+
+@app.route('/edit_ingr', methods=["POST"])
+def edit_ingr():
+    admin = request.form.get("admin")
+    ingredientId = request.form.get("ingredientId")
+    ingrName = request.form.get("ingrName")
+    newName = request.form.get("newName")
+    print("Edit ingredient:", ingredientId, ingrName, newName)
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+        if request.form.get("action") == 'Delete':  # Delete button
+            cursor.execute(                         # Check in recipes
+                'SELECT ingredientId FROM Recipe_Ingredient WHERE ingredientId = %s', 
+                (ingredientId,))
+            if cursor.fetchone():   # Error - ingredient is in some existing recipes
+                ingrList = get_admin_ingr(cursor)
+                return render_template(
+                    'admin_ingr.html', admin = admin, ingrList = ingrList, inRecipes = True)
+            else:
+                cursor.execute(
+                    'DELETE FROM Ingredient WHERE ingredientId = %s', (ingredientId,))
+                conn.commit()
+                ingrList = get_admin_ingr(cursor)
+                return render_template('admin_ingr.html', admin = admin, ingrList = ingrList)
+
+        # Edit Button
+        if newName != ingrName:   # check for duplicate name before changing
+            cursor.execute(
+                'SELECT name FROM Ingredient WHERE name = %s', (newName,))
+            if cursor.fetchone():   # this is a duplicate
+                ingrList = get_admin_ingr(cursor)
+                return render_template(
+                    'admin_ingr.html', admin = admin, ingrList = ingrList, dupName = True)
+
+        cursor.execute(
+            'UPDATE Ingredient SET name = %s, defaultAmount = %s, defaultUnit = %s,'
+            ' calories = %s WHERE ingredientId = %s',
+            (newName, request.form.get("amount"), request.form.get("unit"), 
+             request.form.get("calories"), ingredientId))
+        conn.commit()
+        ingrList = get_admin_ingr(cursor)
+
+        return render_template('admin_ingr.html', admin = admin, ingrList = ingrList)
+    
+    except Exception as e:
+        print("Error on edit_ingredient", e)
+    finally:
+        cursor.close() 
+        conn.close()
+
+@app.route('/toggle_admin', methods=["POST"])
+def toggle_admin():
+    admin = request.form.get("admin")
+    username = request.form.get("username")
+    print("Toggling admin status for", username, request.form.get("status"))
+    try:
+        conn = mysql.connect()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        cursor.execute(
+            'UPDATE User Set admin = %s WHERE name = %s',
+            (1 if int(request.form.get("status")) == 0 else 0, username))
+        conn.commit()
+        userList = get_userlist(cursor)
+
+        return render_template('admin_users.html', admin = admin, userList = userList)    
+    except Exception as e:
+        print("Error on toggle_admin", e)
+    finally:
+        cursor.close() 
+        conn.close()
+
+@app.route('/admin_delete_user', methods=["POST"])
+def admin_delete_user():
+    admin = request.form.get("admin")
+    username = request.form.get("username")
+    return render_template(
+        'confirm_delete.html', username=username, admin=admin, deleteType='admin_user')
+
+@app.route('/back_to_admin', methods=["POST"])
+def back_to_admin():
+    return render_template('admin_page.html', admin = request.form.get("admin"))
+
+@app.route('/admin_entry')
+def admin_entry():
+    return render_template('admin_entry.html')
+
+@app.route('/index.html')
 @app.route('/')
 def index():
     return render_template('index.html')

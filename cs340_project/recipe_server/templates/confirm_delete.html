@@ -31,7 +31,8 @@
                 <form action="/delete" method="post">
                     <label>(You must enter your password to confirm)</label>
                     <input type="hidden" name="deleteType" value="{{deleteType}}" />
-                    <input type="hidden" name="userId" value="{{user.userId}}" />
+                    <input type="hidden" name="username" value="{{username}}" />
+                    <input type="hidden" name="recipeName" value="{{recipe.name}}" />
                     <input type="hidden" name="recipeId" value="{{recipe.recipeId}}" />
                     <input type="password" name="password" required placeholder="password" />
                     <input type="submit" value="DELETE" />
@@ -39,19 +40,33 @@
                 <br />
             </div>
             {% elif deleteType == 'user' %}
-            <h2>Are you sure you want to delete user: {{user.name}}?</h2>
+            <h2>Are you sure you want to delete user: {{username}}?</h2>
             <div>
                 <form action="/delete" method="post">
                     <label>(You must enter your password to confirm)</label>
                     <input type="hidden" name="deleteType" value="{{deleteType}}" />
-                    <input type="hidden" name="userId" value="{{user.userId}}" />
-                    <input type="hidden" name="username" value="{{user.name}}" />
+                    <input type="hidden" name="username" value="{{username}}" />
                     <input type="password" name="password" required placeholder="password" />
                     <input type="submit" value="DELETE" />
                 </form>
                 <br />
             </div>
+
+            {% elif deleteType == 'admin_user' %}
+            <h2>Are you sure you want to delete user: {{username}}?</h2>
+            <div>
+                <form action="/delete" method="post">
+                    <label>(You must enter your password to confirm)</label>
+                    <input type="hidden" name="deleteType" value="{{deleteType}}" />
+                    <input type="hidden" name="toDelete" value="{{username}}" />
+                    <input type="hidden" name="username" value="{{admin}}" />
+                    <input type="password" name="password" required placeholder="your password" />
+                    <input type="submit" value="DELETE" />
+                </form>
+                <br />
+            </div>
             {% endif %}
+
         </div>
     </div>
     <footer>

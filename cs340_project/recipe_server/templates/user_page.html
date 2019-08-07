@@ -54,13 +54,16 @@
                             <td>
                                 <form action="/update_recipe" method="post">
                                     <input type="hidden" name="userId" value="{{user.userId}}" />
+                                    <input type="hidden" name="username" value="{{user.name}}" />
                                     <input type="hidden" name="recipeId" value="{{r.recipeId}}" />
+                                    <input type="hidden" name="recipeName" value="{{r.name}}" />
                                     <input class="edit-btn" type="submit" value="Edit" />
                                 </form>
                             </td>
                             <td>
                                 <form action="/delete_recipe" method="post">
                                     <input type="hidden" name="userId" value="{{user.userId}}" />
+                                    <input type="hidden" name="username" value="{{user.name}}" />
                                     <input type="hidden" name="recipeId" value="{{r.recipeId}}" />
                                     <input class="delete-btn" type="submit" value="Delete" />
                                 </form>
@@ -78,7 +81,6 @@
                 <label>Change username?</label>
                 <input type="hidden" name="userId" value="{{user.userId}}" />
                 <input type="hidden" name="username" value="{{user.name}}" />
-                <input type="hidden" name="password" value="{{user.password}}" />
                 <input type="text" name="newName" placeholder="new username" />
                 <input type="submit" value="Change username" />
             </form><br />

@@ -51,14 +51,19 @@
   <ItemGroup>
     <Content Include="recipe_server\templates\add_recipe_details.html" />
     <Content Include="recipe_server\templates\add_recipe_initial.html" />
+    <Content Include="recipe_server\templates\admin_ingr.html" />
+    <Content Include="recipe_server\templates\admin_sources.html" />
     <Content Include="recipe_server\templates\confirm_delete.html" />
     <Content Include="recipe_server\templates\index.html" />
+    <Content Include="recipe_server\templates\admin_users.html" />
     <Content Include="recipe_server\templates\search_results.html" />
     <Content Include="recipe_server\templates\recipeList.html" />
     <Content Include="recipe_server\templates\recipeDetails.html" />
     <Content Include="recipe_server\templates\update_recipe.html" />
     <Content Include="recipe_server\templates\new_user.html" />
+    <Content Include="recipe_server\templates\admin_entry.html" />
     <Content Include="recipe_server\templates\user_entry.html" />
+    <Content Include="recipe_server\templates\admin_page.html" />
     <Content Include="recipe_server\templates\user_page.html" />
     <Content Include="requirements.txt" />
   </ItemGroup>

@@ -48,7 +48,8 @@
                     <input type="submit" value="Add ingredient from list" />
                 </form><br />
 
-                <form action="/add_recipe_new_ingredient" method="post">
+               {% if dupError %}That ingredient already exists!<br />{% endif %}
+               <form action="/add_recipe_new_ingredient" method="post">
                     <label for="ingredient">Add New Ingredient:</label><br />
                     <input type="hidden" name="userId" value="{{recipe.userId}}" />
                     <input type="hidden" name="recipeId" value="{{recipe.recipeId}}" />

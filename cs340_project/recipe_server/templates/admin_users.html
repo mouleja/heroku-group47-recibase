@@ -1,0 +1,92 @@
+﻿<!DOCTYPE html>
+<!-- Adapted from CS340_starter_flask_app -->
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>ReciBase - User List (ADMIN)</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css?family=Amatic+SC|Cabin+Sketch|Montserrat|Open+Sans|Philosopher&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <div>
+            <h1>Recibase</h1>
+
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/get_recipes">Recipes</a></li>
+                    <li><a href="/user_entry">Your Kitchen</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <div class="page-content">
+        <div class="main-page">
+            <h2>Users:</h2>
+            <div class=table-container>
+                <table border='1'>
+                    <thead>
+                        <tr>
+                            <th>User Name</th>
+                            <th>Admin?</th>
+                            <th>Number of Recipes</th>
+                            <th>Last Submission</th>
+                            <th>Go to User Page</th>
+                            <th>Toggle Admin</th>
+                            <th>Delete?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in userList %}
+                        <tr>
+                            <td>{{u.name}}</td>
+                            <td>{{'Yes' if u.admin == 1 else 'No'}}</td>
+                            <td>{{u.num}}</td>
+                            <td>{{u.last.strftime("%m-%d-%Y") if u.last else ''}}</td>
+                            <td>
+                                <form action="/user_page" method="post">
+                                    <input type="hidden" name="password" value="{{u.password}}" />
+                                    <input type="hidden" name="username" value="{{u.name}}" />
+                                    <input type="submit" value="Go To User Page" />
+                                </form>
+                            </td>
+                            <td>
+                                <form action="/toggle_admin" method="post">
+                                    <input type="hidden" name="admin" value="{{admin}}" />
+                                    <input type="hidden" name="status" value="{{u.admin}}" />
+                                    <input type="hidden" name="username" value="{{u.name}}" />
+                                    <input type="submit" value="Toggle Admin" />
+                                </form>
+                            </td>
+                            <td>
+                                <form action="/admin_delete_user" method="post">
+                                    <input type="hidden" name="admin" value="{{admin}}" />
+                                    <input type="hidden" name="username" value="{{u.name}}" />
+                                    <input type="submit" value="Delete?!?" />
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <br />
+                <h3>Please don't edit users other than the one's you've created :)</h3>
+                <br />
+                <form action="/back_to_admin" method="post">
+                    <input type="hidden" name="admin" value="{{admin}}" />
+                    <input type="submit" value="Back To Admin Page" />
+                </form>
+
+            </div>
+        </div>
+    </div>
+    <footer>
+        <h5>BetaBase Softworks</h5>
+    </footer>
+</body>
+
+
+
+</html>

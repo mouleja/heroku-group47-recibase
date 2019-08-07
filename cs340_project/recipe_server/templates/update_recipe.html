@@ -26,6 +26,7 @@
         <div class="main-page">
             <h2> Edit Recipe:</h2>
             <div>
+                {% if dupName %}<div>You already have a recipe with that name!</div>{% endif %}
                 <form action="change_recipe" method="post">
                     <label>Recipe Name: </label>
                     <input type="hidden" name="changeType" value="name" />
@@ -50,7 +51,7 @@
                     <input type="submit" value="Edit Source" />
                 </form>
                 <br />
-                {% if changeError == 'duplicateSource' %}Sorry, that Source Name is already used!{% endif %}
+                {% if changeError == 'duplicateSource' %}<div>Sorry, that Source Name is already used!</div>{% endif %}
                 <form action="change_recipe" method="post">
                     <label>Add New Source: </label>
                     <input type="hidden" name="changeType" value="add_source" />

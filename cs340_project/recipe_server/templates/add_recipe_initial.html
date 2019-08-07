@@ -26,6 +26,8 @@
         <div class="main-page">
             <h2>Enter details below, submit to add ingredients and instructions:</h2>
             <div>
+                {% if dupSource %}<div>That source already exists!</div>{% endif %}
+                {% if dupName %}<div>You already have a recipe named {{dupName}}!</div>{% endif %}
                 <form action="/add_recipe" method="post">
                     <label for="recipeName">Name: </label>
                     <input type="hidden" name="userId" value="{{userId}}" />
