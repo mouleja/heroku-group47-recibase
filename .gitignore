@@ -6,6 +6,7 @@
 
 # My own additions, based on Flask suggestions
 venv/
+.env
 
 *.pyc
 __pycache__/
