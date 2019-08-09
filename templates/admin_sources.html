@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+<!-- Adapted from CS340_starter_flask_app -->
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>ReciBase - Source List (ADMIN)</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css?family=Amatic+SC|Cabin+Sketch|Montserrat|Open+Sans|Philosopher&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <div>
+            <h1>Recibase</h1>
+
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/get_recipes">Recipes</a></li>
+                    <li><a href="/user_entry">Your Kitchen</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <div class="page-content">
+        <div class="main-page">
+            <h2>Sources:</h2>
+            {% if inRecipes %}<div>You can't delete a source in active recipes!</div>{% endif %}
+            {% if dupName %}<div>That name already exists!</div>{% endif %}
+
+            {% for s in s_list %}
+            <form action="/edit_source" method="post">
+                <input type="hidden" name="admin" value="{{admin}}" />
+                <input type="hidden" name="sourceId" value="{{s.sourceId}}" />
+                <input type="hidden" name="sourceName" value="{{s.name}}" />
+                <input type="text" name="newName" required value="{{s.name}}" />
+                <input type="text" name="url" value="{{s.url}}" />
+                (In {{s.num}} recipes)
+                <input type="submit" name="action" value="Edit" />
+                <input type="submit" name="action" value="Delete" />
+            </form>
+            {% endfor %}
+            <br />
+            (Note: new sources can be added in recipe creation phase only.)
+            <br />
+            <form action="/back_to_admin" method="post">
+                <input type="hidden" name="admin" value="{{admin}}" />
+                <input type="submit" value="Back To Admin Page" />
+            </form>
+        </div>
+    </div>
+    <footer>
+        <h5>BetaBase Softworks</h5>
+    </footer>
+</body>
+
+
+
+</html>

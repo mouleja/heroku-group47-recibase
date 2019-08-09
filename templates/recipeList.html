@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<!-- Adapted from CS340_starter_flask_app -->
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>ReciBase - Recipe List</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css?family=Amatic+SC|Cabin+Sketch|Montserrat|Open+Sans|Philosopher&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <div>
+            <h1>Recibase</h1>
+
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/get_recipes">Recipes</a></li>
+                    <li><a href="/user_entry">Your Kitchen</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <div class="page-content">
+        <div class="main-page">
+            <h3>Current recipes: (Click Name for detailed info)</h3>
+            <div><a href="/user_entry">To Add A Recipe, Go to Your Kitchen</a></div><br />
+            <form action="/search_for" method="get">
+                <div class="search">
+                    <span>Search:</span>
+                    <input type="text" required placeholder="Search Recipes" name="search_text">
+                    <select name="search_type" id="search_type">
+                        <option selected value="Recipes">in recipe names</option>
+                        <option value="Ingredients">in ingredients</option>
+                        <option value="Usernames">in usernames</option>
+                        <option value="Sources">in sources</option>
+                    </select>
+                    <button class="search-btn">Search</button>
+                </div>
+            </form>
+                <div class=table-container>
+                    <table border='1'>
+                        <thead>
+                            <tr>
+                                <th>Recipe Name</th>
+                                <th>User Name</th>
+                                <th>Date</th>
+                                <th>Source</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in recipes %}
+                            <tr>
+                                <td><a href="/show_recipe/{{r.recipeId}}">{{r.recipeName}}</a></td>
+                                <td>{{r.username}}</td>
+                                <td>{{r.date.strftime("%m-%d-%Y")}}</td>
+                                <td>{{r.sourceName}}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+        </div>
+    </div>
+    <footer>
+        <h5>BetaBase Softworks</h5>
+    </footer>
+</body>
+
+
+
+</html>

@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>ReciBase - Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css?family=Amatic+SC|Cabin+Sketch|Montserrat|Open+Sans|Philosopher&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div>
+            <h1>Recibase</h1>
+
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/get_recipes">Recipes</a></li>
+                    <li><a href="/user_entry">Your Kitchen</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <div class="page-content">
+        <div class="main-page">
+            <h2>Welcome to the ReciBase!</h2>
+            <div>Explore the site using the above navigation bar.</div>
+            <hr />
+            <h3>Home - This page</h3>
+            <h3><a href="/get_recipes">Recipes - A list of all submitted recipes</a></h3>
+            <h3><a href="/user_entry">Your Kitchen - View, edit, and delete your submitted recipes</a></h3>
+            <hr/>
+
+            <div>
+                <a href="/admin_entry">Authorized Users Only!</a><br />
+                Click here to view, edit and delete users, sources and ingredients
+            </div>
+        </div>
+    </div>
+    <footer>
+        <h5>BetaBase Softworks</h5>
+    </footer>
+</body>
+</html>

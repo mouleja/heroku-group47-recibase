@@ -1,0 +1,78 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>ReciBase - Confirm delete</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css?family=Amatic+SC|Cabin+Sketch|Montserrat|Open+Sans|Philosopher&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <div>
+            <h1>Recibase</h1>
+
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/get_recipes">Recipes</a></li>
+                    <li><a href="/user_entry">Your Kitchen</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <div class="page-content">
+        <div class="main-page">
+            {% if pwError %}<h2 class="error_msg">Sorry, password doesn't match!</h2>{% endif %}
+            {% if deleteType == 'recipe' %}
+            <h2>Are you sure you want to delete recipe: {{recipe.name}}?</h2>
+            <div>
+                <form action="/delete" method="post">
+                    <label>(You must enter your password to confirm)</label>
+                    <input type="hidden" name="deleteType" value="{{deleteType}}" />
+                    <input type="hidden" name="username" value="{{username}}" />
+                    <input type="hidden" name="recipeName" value="{{recipe.name}}" />
+                    <input type="hidden" name="recipeId" value="{{recipe.recipeId}}" />
+                    <input type="password" name="password" required placeholder="password" />
+                    <input type="submit" value="DELETE" />
+                </form>
+                <br />
+            </div>
+            {% elif deleteType == 'user' %}
+            <h2>Are you sure you want to delete user: {{username}}?</h2>
+            <div>
+                <form action="/delete" method="post">
+                    <label>(You must enter your password to confirm)</label>
+                    <input type="hidden" name="deleteType" value="{{deleteType}}" />
+                    <input type="hidden" name="username" value="{{username}}" />
+                    <input type="password" name="password" required placeholder="password" />
+                    <input type="submit" value="DELETE" />
+                </form>
+                <br />
+            </div>
+
+            {% elif deleteType == 'admin_user' %}
+            <h2>Are you sure you want to delete user: {{username}}?</h2>
+            <div>
+                <form action="/delete" method="post">
+                    <label>(You must enter your password to confirm)</label>
+                    <input type="hidden" name="deleteType" value="{{deleteType}}" />
+                    <input type="hidden" name="toDelete" value="{{username}}" />
+                    <input type="hidden" name="username" value="{{admin}}" />
+                    <input type="password" name="password" required placeholder="your password" />
+                    <input type="submit" value="DELETE" />
+                </form>
+                <br />
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+    <footer>
+        <h5>BetaBase Softworks</h5>
+    </footer>
+</body>
+
+
+</html>
