@@ -1,27 +1,6 @@
-﻿<!DOCTYPE html>
-<!-- Adapted from CS340_starter_flask_app -->
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
-
-<head>
-    <title>ReciBase - Recipe List</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link href="https://fonts.googleapis.com/css?family=Amatic+SC|Cabin+Sketch|Montserrat|Open+Sans|Philosopher&display=swap" rel="stylesheet">
-</head>
-
-<body>
-    <header>
-        <div>
-            <h1>Recibase</h1>
-
-            <nav>
-                <ul>
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/get_recipes">Recipes</a></li>
-                    <li><a href="/user_entry">Your Kitchen</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
+﻿{% extends 'main.html' %}
+{% block title %}Search Results{% endblock %}
+{% block content %}
     <div class="page-content">
         <div class="main-page">
             <h3>Search Results: looking for {{search_text}} in {{search_type}}</h3>
@@ -63,11 +42,4 @@
                 </div>
         </div>
     </div>
-    <footer>
-        <h5>BetaBase Softworks</h5>
-    </footer>
-</body>
-
-
-
-</html>
+{% endblock %}

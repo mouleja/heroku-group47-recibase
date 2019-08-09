@@ -327,6 +327,10 @@ header nav ul li a:hover {
 	margin-bottom: 15px;
 }
 
+.no-source {
+	display: none;
+}
+
 .add-ingredients ul {
 	padding-left: 15px;
 }
