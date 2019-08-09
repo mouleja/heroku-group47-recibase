@@ -8,3 +8,4 @@ pip==19.2.1
 PyMySQL==0.9.3
 setuptools==41.0.1
 Werkzeug==0.15.5
+gunicorn

@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>d03a36cc-bdc6-4379-9ca4-1412490d7da3</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>recipe_server\recipe_server.py</StartupFile>
+    <StartupFile>recipe_server.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -22,16 +22,38 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="hello.py" />
-    <Compile Include="recipe_server\app.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="recipe_server\db_connection.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="recipe_server\recipe_server.py">
-      <SubType>Code</SubType>
-    </Compile>
+    <Folder Include="static\" />
+    <Folder Include="static\css\" />
+    <Folder Include="templates\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include=".gitignore" />
+    <Content Include="Procfile" />
+    <Content Include="Procfile.windows" />
+    <Content Include="requirements.txt" />
+    <Content Include="static\css\style.css" />
+    <Content Include="templates\add_recipe_details.html" />
+    <Content Include="templates\add_recipe_initial.html" />
+    <Content Include="templates\admin_entry.html" />
+    <Content Include="templates\admin_ingr.html" />
+    <Content Include="templates\admin_page.html" />
+    <Content Include="templates\admin_sources.html" />
+    <Content Include="templates\admin_users.html" />
+    <Content Include="templates\confirm_delete.html" />
+    <Content Include="templates\index.html" />
+    <Content Include="templates\new_user.html" />
+    <Content Include="templates\recipeDetails.html" />
+    <Content Include="templates\recipeList.html" />
+    <Content Include="templates\search_results.html" />
+    <Content Include="templates\update_recipe.html" />
+    <Content Include="templates\user_entry.html" />
+    <Content Include="templates\user_page.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="app.py" />
+    <Compile Include="db_connection.py" />
+    <Compile Include="recipe_server.py" />
+    <Compile Include="run.py" />
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="venv\">
@@ -43,29 +65,6 @@
       <PathEnvironmentVariable>PYTHONPATH</PathEnvironmentVariable>
       <Architecture>X64</Architecture>
     </Interpreter>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="recipe_server\" />
-    <Folder Include="recipe_server\templates\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="recipe_server\templates\add_recipe_details.html" />
-    <Content Include="recipe_server\templates\add_recipe_initial.html" />
-    <Content Include="recipe_server\templates\admin_ingr.html" />
-    <Content Include="recipe_server\templates\admin_sources.html" />
-    <Content Include="recipe_server\templates\confirm_delete.html" />
-    <Content Include="recipe_server\templates\index.html" />
-    <Content Include="recipe_server\templates\admin_users.html" />
-    <Content Include="recipe_server\templates\search_results.html" />
-    <Content Include="recipe_server\templates\recipeList.html" />
-    <Content Include="recipe_server\templates\recipeDetails.html" />
-    <Content Include="recipe_server\templates\update_recipe.html" />
-    <Content Include="recipe_server\templates\new_user.html" />
-    <Content Include="recipe_server\templates\admin_entry.html" />
-    <Content Include="recipe_server\templates\user_entry.html" />
-    <Content Include="recipe_server\templates\admin_page.html" />
-    <Content Include="recipe_server\templates\user_page.html" />
-    <Content Include="requirements.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
