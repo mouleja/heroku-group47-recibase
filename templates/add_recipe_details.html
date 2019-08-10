@@ -16,32 +16,24 @@
                     <label for="ingredient">Add Ingredient from List:</label><br />
                     <input type="hidden" name="userId" value="{{recipe.userId}}" />
                     <input type="hidden" name="recipeId" value="{{recipe.recipeId}}" />
-                    <select name="ingredient">
+                    <select name="ingredient" id="ingredient">
+                        <option value="new_ingredient">Add New Ingredient</option>
                         {% for i in ingredientList %}
                         <option value="{{i.ingredientId}}">{{i.name}}</option>
                         {% endfor %}
                     </select>
-                    <input type="number" step="0.01" name="amount" required placeholder="Amount" />
-                    <input type="text" name="unit" required placeholder="Unit" />
-                    <input type="text" name="preperation" placeholder="Preperation (optional)" /><br />
-                    <input type="submit" value="Add ingredient from list" />
-                </form><br />
-
-               {% if dupError %}That ingredient already exists!<br />{% endif %}
-               <form action="/add_recipe_new_ingredient" method="post">
-                    <label for="ingredient">Add New Ingredient:</label><br />
-                    <input type="hidden" name="userId" value="{{recipe.userId}}" />
-                    <input type="hidden" name="recipeId" value="{{recipe.recipeId}}" />
-                    <input type="text" name="ingredientName" required placeholder="Ingredient Name" />
+                    <input type="text" name="newIngredientName" id="new-ingredient" required placeholder="Enter New Ingredient Name">
                     <input type="number" step="0.01" name="amount" required placeholder="Amount" />
                     <input type="text" name="unit" required placeholder="Unit" />
                     <input type="text" name="preperation" placeholder="Preperation (optional)" />
                     <br />
-                    <input type="number" step="0.01" name="defaultAmount" placeholder="Default Amount (optional)" />
-                    <input type="text" name="defaultUnit" placeholder="Default Unit (optional)" />
-                    <input type="number" name="calories" placeholder="Calories (optional)" /><br />
-                    <input type="submit" value="Add New Ingredient" />
+                    <input type="number" step="0.01" name="defaultAmount" id="default-amount" placeholder="Default Amount (optional)" />
+                    <input type="text" name="defaultUnit" id="default-unit" placeholder="Default Unit (optional)" />
+                    <input type="number" name="calories" id="calories" placeholder="Calories (optional)" /><br />
+                    <input type="submit" value="Add Ingredient" />
                 </form><br />
+
+               {% if dupError %}That ingredient already exists!<br />{% endif %}
             </div>
 
             <h2>Instructions:</h2>
@@ -63,4 +55,5 @@
             </div>
         </div>
     </div>
+    <script src="{{ url_for('static', filename='javascript/addRecipeDetails.js') }}"></script> 
     {% endblock %}

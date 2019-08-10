@@ -34,7 +34,7 @@ def get_recipe_ingredients(cursor, recipeId):
         '''SELECT i.ingredientId, i.name, ri.amount, ri.unit, ri.preperation
         FROM Recipe_Ingredient ri
         INNER JOIN Ingredient i ON i.ingredientId = ri.ingredientId
-        WHERE ri.recipeId = %s''', (recipeId,)
+        WHERE ri.recipeId = %s ORDER BY i.name ASC''', (recipeId,)
     )
     ingredients = cursor.fetchall()
     return ingredients
@@ -45,7 +45,7 @@ def get_recipe_steps(cursor, recipeId):
     return steps
 
 def get_source_list(cursor):
-    cursor.execute('SELECT sourceId, name FROM Source')
+    cursor.execute('SELECT sourceId, name FROM Source ORDER BY name ASC')
     sourceList = cursor.fetchall()
     return sourceList
 
@@ -98,7 +98,7 @@ def get_recipes():
             '''SELECT r.recipeId, r.name recipeName, r.date, u.name username, s.name sourceName 
             FROM Recipe r 
             INNER JOIN User u on u.userId = r.userId
-            LEFT JOIN Source s on s.sourceId = r.sourceId'''
+            LEFT JOIN Source s on s.sourceId = r.sourceId ORDER BY recipeName ASC'''
         )
         result = cursor.fetchall()
         print("Getting all recipes.")
@@ -395,31 +395,30 @@ def add_recipe_initial():
 
 @app.route('/add_recipe', methods=['POST'])
 def add_recipe():
+    print(request.form)
     userId = request.form.get("userId")
     recipeName = request.form.get("recipeName")
-    source = request.form.get('source')
+    source = None
+    sourceUrl = None
     try:
         conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
-
-        if source == 'no_source':
-            source = None
-        elif source == 'new_source':
-            new_name = request.form.get("new_name")
-            if not new_name:    # treat new_source with no new_name as NULL source
-                source = None
-            else:
-                cursor.execute('SELECT name FROM Source WHERE name = %s', (new_name,))
-                if cursor.fetchone():   # Source name already exists
+        
+        if request.form.getlist('source-check'):
+            source = request.form['source']
+            sourceUrl = request.form['source-url']
+            if source == 'new_source':
+                source = request.form['new-source-name']
+                cursor.execute('SELECT name from Source WHERE name = %s', (source))
+                if cursor.fetchone():
                     sourceList = get_source_list(cursor)
                     return render_template('add_recipe_initial.html',
                         userId=userId, sourceList=sourceList, dupSource=True)
-
-                cursor.execute('INSERT INTO Source (name, url) VALUES (%s, %s)',
-                               (new_name, request.form.get('new_url')))
+                cursor.execute('INSERT INTO Source (name, url) VALUES (%s, %s)', (source, sourceUrl))
                 conn.commit()
-                cursor.execute('SELECT sourceId FROM Source WHERE name = %s', (new_name,))
+                cursor.execute('SELECT sourceId FROM Source WHERE name = %s', (source))
                 source = cursor.fetchone()['sourceId']
+                conn.commit()
 
         cursor.execute(
             'SELECT name FROM Recipe WHERE name = %s and userId = %s', (recipeName, userId))
@@ -442,6 +441,7 @@ def add_recipe():
     
     except Exception as e:
         print("Error adding recipe -", recipeName, e)
+        print(request.form)
     finally:
         cursor.close() 
         conn.close()
@@ -451,16 +451,50 @@ def add_recipe():
 @app.route('/add_recipe_ingredient', methods=['POST'])
 def add_recipe_ingredient():
     recipeId = request.form.get("recipeId")
+    ingredientName = request.form.get('newIngredientName')
+    ingredientId = request.form.get('ingredient')
     try:
         conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
+        #if an ingredient not in the ingredient list is added, add the ingredient to the list and recipe
+        if ingredientId == 'new_ingredient':
+            print(
+            "Adding new ingredient to", recipeId, ingredientName, request.form.get('amount'), 
+            request.form.get('unit'), request.form.get('preperation'))
 
-        print("Adding ingredient to", recipeId, request.form.get('ingredient'), request.form.get('amount'), request.form.get('unit'), request.form.get('preperation'))
+            cursor.execute(
+            'SELECT name from Ingredient WHERE name = %s', (ingredientName,))
 
+            #checking if the ingredient is already in the ingredient list
+            if cursor.fetchone():
+                recipe = get_basic_recipe(cursor, recipeId)
+                ingredientList = get_ingredient_list(cursor)
+                ingredients = get_recipe_ingredients(cursor, recipeId)
+                steps = get_recipe_steps(cursor, recipeId)
+
+                return render_template(
+                    'add_recipe_details.html', recipe=recipe, ingredients = ingredients, 
+                    steps = steps, ingredientList = ingredientList, dupError = True)
+            #end duplicate ingredient check
+            print(request.form)
+            #insert the ingredient into the database table
+            cursor.execute(
+                '''INSERT INTO Ingredient (name, defaultAmount, defaultUnit, calories)
+                VALUES (%s, %s, %s, %s)''',
+                    (ingredientName, request.form.get("defaultAmount"), request.form.get("defaultUnit"), 
+                     request.form.get("calories")))
+            conn.commit()
+            cursor.execute('SELECT ingredientId FROM Ingredient WHERE name=%s', (ingredientName))
+            ingredientId = cursor.fetchone()['ingredientId']
+            conn.commit()
+        
+        print("Adding ingredient to", recipeId, ingredientId, request.form.get('amount'), request.form.get('unit'), request.form.get('preperation'))
+
+        #add the ingredient into the recipe
         cursor.execute(
             '''INSERT INTO Recipe_Ingredient (recipeId, ingredientId, amount, unit, preperation)
             VALUES (%s, %s, %s, %s, %s)''',
-                (recipeId, request.form.get('ingredient'), request.form.get('amount'), 
+                (recipeId, ingredientId, request.form.get('amount'), 
                  request.form.get("unit"), request.form.get("preperation")))
         conn.commit()
 
@@ -503,7 +537,7 @@ def add_recipe_new_ingredient():
             return render_template(
                 'add_recipe_details.html', recipe=recipe, ingredients = ingredients, 
                 steps = steps, ingredientList = ingredientList, dupError = True)
-
+        print(request.form)
         cursor.execute(
             '''INSERT INTO Ingredient (name, defaultAmount, defaultUnit, calories)
             VALUES (%s, %s, %s, %s)''',

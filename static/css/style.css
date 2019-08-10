@@ -17,16 +17,22 @@ body {
 	width: 100%;
 	margin: 0px 0px 5px 0px;
 	background-color: #f5f5dc;
+	background-image: url('../images/backgroundpic1.jpg');
+	background-size: cover;
+	background-repeat: no-repeat;
+
 }
 
 header {
-	background-color: #f5f5dc;
+	/*background-color: #f5f5dc;*/
+	background-color: #fff;
 	width: 100%;
 	height: 70px;
 	position: fixed;
 	top: 0;
 	left: 0;
-	padding: 0;
+	/*padding: 0;*/
+	padding-top: 10px;
 	z-index: 99;
 }
 header div {
@@ -36,7 +42,7 @@ header div {
 	height: 100%;
 	margin: 0 auto;
 	background-color: #fff;
-	padding-top: 10px;
+	/*padding-top: 10px;*/
 }
 
 header h1 {
@@ -115,6 +121,9 @@ header nav ul li a:hover {
 	height:100%;
 	margin: 0 auto;
 	background-color: #fff;
+	/*background-image: url('../images/backgroundpic1.jpg');
+	background-size: cover;
+	background-repeat: no-repeat;*/
 }
 
 /************************************************************************************
@@ -328,6 +337,10 @@ header nav ul li a:hover {
 }
 
 .no-source {
+	display: none;
+}
+
+.no-new-ingredient {
 	display: none;
 }
 
