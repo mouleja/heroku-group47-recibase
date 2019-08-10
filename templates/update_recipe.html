@@ -50,9 +50,9 @@
                             <input type="hidden" name="changeType" value="change_ingredient" />
                             <input type="hidden" name="recipeId" value="{{recipe.recipeId}}" />
                             <input type="hidden" name="ingredientId" value="{{i.ingredientId}}" />
-                            <input type="text" name="amount" value="{{i.amount}}" />
+                            <input type="number" step="0.01" min="0.01" max="9999" name="amount" value="{{i.amount}}" />
                             <input type="text" name="unit" value="{{i.unit}}" />
-                            <input type="text" name="preperation" value="{{i.preperation}}" />
+                            <input type="text" name="preperation" placeholder="preperation (optional)" value="{{i.preperation}}" />
                             <input type="submit" name="action" value="Edit" />
                             <input type="submit" name="action" value="Delete" />
                         </form>
@@ -70,7 +70,7 @@
                         <option value="{{i.ingredientId}}">{{i.name}}</option>
                         {% endfor %}
                     </select>
-                    <input type="number" step="0.01" required name="amount" placeholder="Amount" />
+                    <input type="number" step="0.01" min="0.01" max="9999" required name="amount" placeholder="Amount" />
                     <input type="text" required name="unit" placeholder="Units" />
                     <input type="text" name="preperation" placeholder="Preperation (optional)" />
                     <input type="submit" value="Add Ingredient" />
@@ -82,12 +82,12 @@
                     <input type="hidden" name="changeType" value="add_new_ingredient" />
                     <input type="hidden" name="recipeId" value="{{recipe.recipeId}}" />
                     <input type="text" name="ingredientName" required placeholder="Ingredient Name" />
-                    <input type="number" step="0.01" name="amount" required placeholder="Amount" />
+                    <input type="number" step="0.01" min="0.01" max="9999" name="amount" required placeholder="Amount" />
                     <input type="text" name="unit" required placeholder="Units" />
                     <input type="text" name="preperation" placeholder="Preperation (optional)" /><br />
-                    <input type="number" step="0.01" name="defaultAmount" placeholder="Default Amount (optional)" />
+                    <input type="number" step="0.01" min="0.01" max="9999" name="defaultAmount" placeholder="Default Amount (optional)" />
                     <input type="text" name="defaultUnit" placeholder="Default Units (optional)" />
-                    <input type="number" name="calories" placeholder="Calories (optional)" />
+                    <input type="number" name="calories" min="0" max="9999" placeholder="Calories (optional)" />
                     <input type="submit" value="Add A New Ingredient" />
                 </form><br />
 

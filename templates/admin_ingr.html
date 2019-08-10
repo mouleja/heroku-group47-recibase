@@ -15,7 +15,7 @@
                 <input type="text" name="newName" required value="{{i.name}}" />
                 <input type="text" name="amount" value="{{i.defaultAmount}}" />
                 <input type="text" name="unit" value="{{i.defaultUnit}}" />
-                <input type="number" name="calories" value="{{i.calories}}" />
+                <input type="number" min="0" max="9999" name="calories" value="{{i.calories}}" />
                 (In {{i.num}} recipes)
                 <input type="submit" name="action" value="Edit" />
                 <input type="submit" name="action" value="Delete" />
