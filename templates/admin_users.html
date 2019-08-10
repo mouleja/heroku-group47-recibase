@@ -18,7 +18,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for u in userList %}
+                        {% for u in userList %}{% if u.name not in ['Jason', 'Tommy', 'guest', 'admin']%}
                         <tr>
                             <td>{{u.name}}</td>
                             <td>{{'Yes' if u.admin == 1 else 'No'}}</td>
@@ -47,11 +47,12 @@
                                 </form>
                             </td>
                         </tr>
-                        {% endfor %}
+                        {% endif %}{% endfor %}
                     </tbody>
                 </table>
                 <br />
                 <h3>Please don't edit users other than the one's you've created :)</h3>
+                <h3>Certain users not in this list for security reasons</h3>
                 <br />
                 <form action="/back_to_admin" method="post">
                     <input type="hidden" name="admin" value="{{admin}}" />

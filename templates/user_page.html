@@ -1,5 +1,5 @@
 ﻿{% extends 'main.html' %}
-{% block title %}User Page{% endblock %}
+{% block title %}User Page for {{user.name}}{% endblock %}
 {% block content %}
     <div class="page-content">
         <div class="main-page">
@@ -55,6 +55,7 @@
             </div>
             <hr />
 
+            {% if user.name not in ['Jason', 'Tommy', 'guest', 'admin']%}
             {% if usedError %}<h2 class="error_msg">Sorry that name is taken, try again...</h2>{% endif %}
             <form action="/change_username" method="post">
                 <label>Change username?</label>
@@ -78,6 +79,9 @@
                 <input type="hidden" name="username" value="{{user.name}}" />
                 <input type="submit" value="Delete {{user.name}}!?!" />
             </form><br />
+            {% endif %}
+            <hr />
+            <h4>Note: Certain users, like guest and admin have user information editing disabled, create a new user to see that functionality</h4>
         </div>
     </div>
 {% endblock %}
