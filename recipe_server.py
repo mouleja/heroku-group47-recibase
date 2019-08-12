@@ -855,7 +855,7 @@ def edit_source():
                     'admin_sources.html', admin = admin, s_list = s_list)
 
         # Edit Button
-        if newName != sourceName:   # check for duplicate name before changing
+        if newName.lower() != sourceName.lower():   # check for duplicate name before changing
             cursor.execute('SELECT name FROM Source WHERE name = %s', (newName,))
             if cursor.fetchone():   # this is a duplicate
                 s_list = get_admin_sources(cursor)
@@ -919,9 +919,8 @@ def edit_ingr():
                 return render_template('admin_ingr.html', admin = admin, ingrList = ingrList)
 
         # Edit Button
-        if newName != ingrName:   # check for duplicate name before changing
-            cursor.execute(
-                'SELECT name FROM Ingredient WHERE name = %s', (newName,))
+        if newName.lower() != ingrName.lower():   # check for duplicate name before changing
+            cursor.execute('SELECT name FROM Ingredient WHERE name = %s', (newName,))
             if cursor.fetchone():   # this is a duplicate
                 ingrList = get_admin_ingr(cursor)
                 return render_template(
