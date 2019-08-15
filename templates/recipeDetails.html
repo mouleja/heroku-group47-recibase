@@ -11,7 +11,7 @@
                 <h3>Ingredients:</h3>
                 <ul>
                     {% for i in ingredients %}
-                    <li>{{i.amount}} {{i.unit}} of {{i.name}} {% if i.preperation %}({{i.preperation}}){% endif %}</li>
+                    <li class="recipe-ingredient">{{i.amount}} {{i.unit}} of {{i.name}} {% if i.preperation %}({{i.preperation}}){% endif %}</li>
                     {% endfor %}
                 </ul>
 
@@ -19,7 +19,7 @@
                 <h3>Steps:</h3>
                 <ol>
                     {% for s in steps %}
-                    <li>{{s.instruction}}</li>
+                    <li class="recipe-step">{{s.instruction}}</li>
                     {% endfor %}
                 </ol>
                 <hr />

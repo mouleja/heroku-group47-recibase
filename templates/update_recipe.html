@@ -42,23 +42,34 @@
 
                 <hr />
                 <h3>Ingredients:</h3>
-                <ul>
-                    {% for i in ingredients %}
-                    <li>
-                        <form action="change_recipe" method="post">
-                            <label>{{i.name}}</label>
-                            <input type="hidden" name="changeType" value="change_ingredient" />
-                            <input type="hidden" name="recipeId" value="{{recipe.recipeId}}" />
-                            <input type="hidden" name="ingredientId" value="{{i.ingredientId}}" />
-                            <input type="number" step="0.01" min="0.01" max="9999" name="amount" value="{{i.amount}}" />
-                            <input type="text" name="unit" value="{{i.unit}}" />
-                            <input type="text" name="preperation" placeholder="preperation (optional)" value="{{i.preperation}}" />
-                            <input type="submit" name="action" value="Edit" />
-                            <input type="submit" name="action" value="Delete" />
-                        </form>
-                    </li>
-                    {% endfor %}
-                </ul><br />
+                <div class="update-ingredient-table">
+                    <div class="update-ingredient-thead">
+                        <span class="update-ingredient-th"></span>
+                        <span class="update-ingredient-th">Amount</span>
+                        <span class="update-ingredient-th">Units</span>
+                        <span class="update-ingredient-th">Preperation</span>
+                        <span class="update-ingredient-th"></span>
+                        <span class="update-ingredient-th"></span>
+                    </div>
+                    <div class="update-ingredient-tbody">
+                        {% for i in ingredients %}
+                        
+                            <form class="update-ingredient-tr" action="change_recipe" method="post">
+                                <span class="update-ingredient-td"><label>{{i.name}}</label></span>
+                                <input type="hidden" name="changeType" value="change_ingredient" />
+                                <input type="hidden" name="recipeId" value="{{recipe.recipeId}}" />
+                                <input type="hidden" name="ingredientId" value="{{i.ingredientId}}" />
+                                <span class="update-ingredient-td"><input class="amount" type="number" min="0.01" max="9999" step="0.01" name="amount" value="{{i.amount}}" /></span>
+                                <span class="update-ingredient-td"><input class="unit" type="text" name="unit" value="{{i.unit}}" /></span>
+                                <span class="update-ingredient-td"><input class="prep" type="text" name="preperation" value="{{i.preperation}}" /></span>
+                                <span class="update-ingredient-td btn"><input type="submit" name="action" value="Edit" /></span>
+                                <span class="update-ingredient-td btn"><input type="submit" name="action" value="Delete" /></span>
+                            </form>
+                       
+                        {% endfor %}
+                    </div>
+                </div>
+                <br />
 
                 {% if changeError == 'duplicateIngredient' %}Sorry, that ingredient is already in the recipe!{% endif %}
                 <form action="change_recipe" method="post">
@@ -70,9 +81,9 @@
                         <option value="{{i.ingredientId}}">{{i.name}}</option>
                         {% endfor %}
                     </select>
-                    <input type="number" step="0.01" min="0.01" max="9999" required name="amount" placeholder="Amount" />
-                    <input type="text" required name="unit" placeholder="Units" />
-                    <input type="text" name="preperation" placeholder="Preperation (optional)" />
+                    <input class="amount" type="number" min="0.01" max="9999" step="0.01" required name="amount" placeholder="Amount" />
+                    <input class="unit" type="text" required name="unit" placeholder="Units" />
+                    <input type="text" name="preperation" placeholder="Preparation (optional)" />
                     <input type="submit" value="Add Ingredient" />
                 </form><br />
 
@@ -82,26 +93,27 @@
                     <input type="hidden" name="changeType" value="add_new_ingredient" />
                     <input type="hidden" name="recipeId" value="{{recipe.recipeId}}" />
                     <input type="text" name="ingredientName" required placeholder="Ingredient Name" />
-                    <input type="number" step="0.01" min="0.01" max="9999" name="amount" required placeholder="Amount" />
-                    <input type="text" name="unit" required placeholder="Units" />
-                    <input type="text" name="preperation" placeholder="Preperation (optional)" /><br />
-                    <input type="number" step="0.01" min="0.01" max="9999" name="defaultAmount" placeholder="Default Amount (optional)" />
+                    <input class="amount" type="number" min="0.01" max="9999" step="0.01" name="amount" required placeholder="Amount" />
+                    <input class="unit" type="text" name="unit" required placeholder="Units" />
+                    <input type="text" name="preperation" placeholder="Preparation (optional)" />
+                    <br>
+                    <input type="number" min="0.01" max="9999" step="0.01" name="defaultAmount" placeholder="Default Amount (optional)" />
                     <input type="text" name="defaultUnit" placeholder="Default Units (optional)" />
-                    <input type="number" name="calories" min="0" max="9999" placeholder="Calories (optional)" />
+                    <input type="number" min="0" max="9999" name="calories" placeholder="Calories (optional)" />
                     <input type="submit" value="Add A New Ingredient" />
                 </form><br />
 
 
                 <hr />
                 <h3>Steps:</h3>
-                <ol>
+                <ol class="instruction-list">
                     {% for s in steps %}
                     <li>
                         <form action="change_recipe" method="post">
                             <input type="hidden" name="changeType" value="edit_step" />
                             <input type="hidden" name="recipeId" value="{{recipe.recipeId}}" />
                             <input type="hidden" name="step" value="{{s.step}}" />
-                            <textarea name="instruction" required>{{s.instruction}}</textarea>
+                            <textarea class="update-instructions" name="instruction" required>{{s.instruction}}</textarea>
                             <input type="submit" name="action" value="Edit" />
                         </form>
                     </li>
@@ -119,12 +131,12 @@
                 {% endif %}
 
                 <form action="change_recipe" method="post">
-                    <label>Add A New Step: </label>
+                    <p>Add A New Step: </p>
                     <input type="hidden" name="changeType" value="add_step" />
                     <input type="hidden" name="recipeId" value="{{recipe.recipeId}}" />
                     <input type="hidden" name="step" value="{{steps[-1]['step'] + 1 if steps else 1}}" />
-                    <textarea name="instruction" required placeholder="Enter new instruction here ..." ></textarea>
-                    <input type="submit" value="Add A New Step" />
+                    <textarea class="update-instructions" name="instruction" required placeholder="Enter new instruction..." style="margin-bottom:10px;"></textarea>
+                    <input style="display: block;" type="submit" value="Add A New Step" />
                 </form>
 
                 <hr />

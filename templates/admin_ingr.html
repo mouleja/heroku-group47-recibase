@@ -7,21 +7,38 @@
             {% if inRecipes %}<div>You can't delete an ingredient in active recipes!</div>{% endif %}
             {% if dupName %}<div>That ingredient already exists!</div>{% endif %}
 
-            {% for i in ingrList %}
-            <form action="/edit_ingr" method="post">
-                <input type="hidden" name="admin" value="{{admin}}" />
-                <input type="hidden" name="ingredientId" value="{{i.ingredientId}}" />
-                <input type="hidden" name="ingrName" value="{{i.name}}" />
-                <input type="text" name="newName" required value="{{i.name}}" />
-                <input type="text" name="amount" value="{{i.defaultAmount}}" />
-                <input type="text" name="unit" value="{{i.defaultUnit}}" />
-                <input type="number" min="0" max="9999" name="calories" value="{{i.calories}}" />
-                (In {{i.num}} recipes)
-                <input type="submit" name="action" value="Edit" />
-                <input type="submit" name="action" value="Delete" />
-            </form>
-            {% endfor %}
-            <br />
+            <div class="table">
+                <div class="thead">
+                    <div class="tr">
+                        <span class="th">Name</span>
+                        <span class="th">Default Amount</span>
+                        <span class="th">Default Unit</span>
+                        <span class="th">Calories</span>
+                        <span class="th">Recipe Count</span>
+                        <span class="th"></span>
+                        <span class="th"></span>
+                    </div>
+                </div>
+                <div class="tbody">
+                    {% for i in ingrList %}
+                    <form class="tr" action="/edit_ingr" method="post">
+                        <input type="hidden" name="admin" value="{{admin}}" />
+                        <input type="hidden" name="ingredientId" value="{{i.ingredientId}}" />
+                        <input type="hidden" name="ingrName" value="{{i.name}}" />
+                        <span class="td"><input type="text" name="newName" required value="{{i.name}}" /></span>
+                        <span class="td"><input type="number" min="0.01" max="9999" step="0.01" 
+                            name="amount" {% if i.defaultAmount %} value="{{i.defaultAmount}}" {% endif %} /></span>
+                        <span class="td"><input type="text" name="unit" value="{{i.defaultUnit}}" /></span>
+                        <span class="td"><input type="number" min="0" max="9999" name="calories" 
+                            {% if i.calories %} value="{{i.calories}}" {% endif %} /></span>
+                        <span class="td">(In {{i.num}} recipes)</span>
+                        <span class="td"><input type="submit" name="action" value="Edit" /></span>
+                        <span class="td"><input type="submit" name="action" value="Delete" /></span>
+                    </form>
+                    {% endfor %}
+                </div>
+            </div>
+
             (Note: new ingredients can be added in recipe creation phase only.)
             <br />
             <form action="/back_to_admin" method="post">

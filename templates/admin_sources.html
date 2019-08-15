@@ -7,18 +7,32 @@
             {% if inRecipes %}<div>You can't delete a source in active recipes!</div>{% endif %}
             {% if dupName %}<div>That name already exists!</div>{% endif %}
 
-            {% for s in s_list %}
-            <form action="/edit_source" method="post">
-                <input type="hidden" name="admin" value="{{admin}}" />
-                <input type="hidden" name="sourceId" value="{{s.sourceId}}" />
-                <input type="hidden" name="sourceName" value="{{s.name}}" />
-                <input type="text" name="newName" required value="{{s.name}}" />
-                <input type="text" name="url" value="{{s.url}}" />
-                (In {{s.num}} recipes)
-                <input type="submit" name="action" value="Edit" />
-                <input type="submit" name="action" value="Delete" />
-            </form>
-            {% endfor %}
+            <div class="table">
+                <div class="thead">
+                    <div class="tr">
+                        <span class="th">Name</span>
+                        <span class="th">URL</span>
+                        <span class="th">Recipe Count</span>
+                        <span class="th"></span>
+                        <span class="th"></span>
+                    </div>
+                </div>
+                <div class="tbody">
+                    {% for s in s_list %}
+                    <form class="tr" action="/edit_source" method="post">
+                        <input type="hidden" name="admin" value="{{admin}}" />
+                        <input type="hidden" name="sourceId" value="{{s.sourceId}}" />
+                        <input type="hidden" name="sourceName" value="{{s.name}}" />
+                        <span class="td"><input type="text" name="newName" required value="{{s.name}}" /></span>
+                        <span class="td"><input type="text" name="url" value="{{s.url}}" /></span>
+                        <span class="td">(In {{s.num}} recipes)</span>
+                        <span class="td"><input type="submit" name="action" value="Edit" /></span>
+                        <span class="td"><input type="submit" name="action" value="Delete" /></span>
+                    </form>
+                    {% endfor %}
+                </div>
+            </div>
+            
             <br />
             (Note: new sources can be added in recipe creation phase only.)
             <br />
