@@ -11,16 +11,7 @@
                     <label for="recipeName">Name: </label>
                     <input type="hidden" name="userId" value="{{userId}}" />
                     <input type="text" name="recipeName" required placeholder="Name of Recipe" /><br />
-                    <!-- <label for="source">Source:</label>
-                    <select name="source">
-                        <option selected value="no_source">Leave Blank</option>
-                        <option value="new_source">Add a new source</option>
-                        {% for s in sourceList %}
-                        <option value="{{s.sourceId}}">{{s.name}}</option>
-                        {% endfor %}
-                    </select>
-                    <input type="text" name="new_name" placeholder="Add new source name" />
-                    <input type="text" name="new_url" placeholder="Add url for new source (optional)" /> -->
+                    
                     <span>Source: <input name="source-check" id="source-check" type="checkbox"></span>
                     <select name="source" class="no-source" id="sourceName">
                         <option value="new_source">Add a new source</option>

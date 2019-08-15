@@ -27,9 +27,9 @@
                     <input type="text" name="unit" required placeholder="Unit" />
                     <input type="text" name="preperation" placeholder="Preperation (optional)" />
                     <br />
-                    <input type="number" step="0.01" min="0.01" max="9999" name="defaultAmount" id="default-amount" placeholder="Default Amount (optional)" />
+                    <input class="default-amount" type="number" step="0.01" min="0.01" max="9999" name="defaultAmount" id="default-amount" placeholder="Default Amount (optional)" />
                     <input type="text" name="defaultUnit" id="default-unit" placeholder="Default Unit (optional)" />
-                    <input type="number" name="calories" id="calories" min="0" max="9999" placeholder="Calories (optional)" /><br />
+                    <input class="default-calories" type="number" name="calories" id="calories" min="0" max="9999" placeholder="Calories (optional)" /><br />
                     <input type="submit" value="Add Ingredient" />
                 </form><br />
 
@@ -49,7 +49,7 @@
                     <input type="hidden" name="userId" value="{{recipe.userId}}" />
                     <input type="hidden" name="recipeId" value="{{recipe.recipeId}}" />
                     <input type="hidden" name="step" value="{{steps[-1]['step'] + 1 if steps else 1}}" />
-                    <textarea name="instruction" required placeholder="Add new instruction here ..."></textarea><br />
+                    <textarea class="update-instructions" name="instruction" required placeholder="Add new instruction here ..."></textarea><br />
                     <input type="submit" value="Add instruction" />
                 </form><br />
             </div>

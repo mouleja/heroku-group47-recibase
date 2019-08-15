@@ -22,8 +22,6 @@ body {
     background-repeat: round;
     background-attachment: fixed;
     background-blend-mode: overlay;
-	/*background-size: cover;
-	background-repeat: no-repeat;*/
 
 }
 
@@ -130,9 +128,7 @@ header nav ul li a:hover {
 	height:100%;
 	margin: 0 auto;
 	background-color: #fff;
-	/*background-image: url('../images/backgroundpic1.jpg');
-	background-size: cover;
-	background-repeat: no-repeat;*/
+	
 }
 
 /************************************************************************************
@@ -330,6 +326,10 @@ input[type="submit"]:hover, .search-btn:hover {
 
 .update-ingredient-td.btn {
 	display: inline-block;
+}
+
+.default-amount, .default-calories {
+	min-width: 180px;
 }
 
 .instruction-list {
