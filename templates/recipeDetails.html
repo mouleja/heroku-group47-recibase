@@ -11,7 +11,10 @@
                 <h3>Ingredients:</h3>
                 <ul>
                     {% for i in ingredients %}
-                    <li class="recipe-ingredient">{{i.amount}} {{i.unit}} of {{i.name}} {% if i.preperation %}({{i.preperation}}){% endif %}</li>
+                    <li class="recipe-ingredient">
+                        <input id="completeIngr_{{loop.index}}" type="checkbox" class="complete-box">
+                        <label for="completeIngr_{{loop.index}}">{{i.amount}} {{i.unit}} of {{i.name}} {% if i.preperation %}({{i.preperation}}){% endif %}<span class="checkmark"></span></label>
+                    </li>
                     {% endfor %}
                 </ul>
 
@@ -19,7 +22,10 @@
                 <h3>Steps:</h3>
                 <ol>
                     {% for s in steps %}
-                    <li class="recipe-step">{{s.instruction}}</li>
+                    <li class="recipe-step">
+                        <input id="completeStep_{{loop.index}}" type="checkbox" class="complete-box">
+                        <label for="completeStep_{{loop.index}}">{{s.instruction}}<span class="checkmark"></span></label>
+                    </li>
                     {% endfor %}
                 </ol>
                 <hr />

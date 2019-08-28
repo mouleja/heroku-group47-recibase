@@ -259,6 +259,64 @@ input[type="submit"]:hover, .search-btn:hover {
 	}
 
 }
+
+/************************************************************************************
+*			RECIPE DETAILS PAGE STYLE
+**************************************************************************************/
+
+.complete-box {
+	display: none;
+}
+.complete-box + label {
+	cursor: pointer;
+}
+
+.complete-box:checked + label {
+	text-decoration: line-through;
+}
+
+.checkmark {
+	position: relative;
+	display: inline-block;
+	top: 3px;
+	left: 5px;
+	width: 15px;
+	height: 15px;
+	background-color: #f5f5dc;
+}
+
+.checkmark::after {
+	content: "";
+	display: none;
+
+}
+
+.complete-box + label:hover .checkmark {
+	background-color: #f2eecf;
+}
+
+.complete-box:checked + label .checkmark::after {
+	display: block;
+}
+
+.complete-box:checked + label .checkmark {
+	background-color: #f2eecf;
+}
+
+.complete-box + label .checkmark:after {
+	position: relative;
+	top: 3px;
+	left: 5px;
+	width: 3px;
+	height: 5px;
+	border: solid black;
+	border-width: 0 1px 1px 0;
+	-webkit-transform: rotate(45deg);
+	-ms-transform: rotate(45deg);
+	transform: rotate(45deg);
+}
+
+
 /************************************************************************************
 *			EDIT RECIPE PAGE STYLE
 *************************************************************************************/
