@@ -29,11 +29,10 @@ header {
 	/*background-color: #f5f5dc;*/
 	background-color: #fff;
 	width: 100%;
-	height: 70px;
+	height: 90px;
 	position: fixed;
 	top: 0;
 	left: 0;
-	/*padding: 0;*/
 	padding-top: 10px;
 	z-index: 99;
 }
@@ -81,6 +80,10 @@ header nav ul li {
 
 }
 
+header nav ul li:last-child {
+	display: block;
+}
+
 header nav ul li a {
 	font-family: 'Cabin Sketch';
 	font-size: 14px;
@@ -114,6 +117,10 @@ header nav ul li a:hover {
 		font-size: 32px;
 	}
 
+	header nav ul li:last-child {
+		display: inline-block;
+	}
+
 	header nav ul li a {
 		font-size: 20px;
 	}
@@ -122,7 +129,7 @@ header nav ul li a:hover {
 
 .page-content {
 	padding: 0 10px;
-	padding-top: 75px;
+	padding-top: 90px;
 	padding-bottom: 20px;
 	width: 87%;
 	height:100%;
