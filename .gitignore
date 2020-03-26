@@ -7,6 +7,7 @@
 # My own additions, based on Flask suggestions
 venv/
 .env
+db_connection.py
 
 *.pyc
 __pycache__/
@@ -357,3 +358,4 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+.vscode/settings.json
